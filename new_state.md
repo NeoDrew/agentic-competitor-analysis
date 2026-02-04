@@ -1,562 +1,1091 @@
-Pricing – Linear
+Vercel Pricing: Hobby, Pro, and Enterprise plans
 
-[Skip to content →](#skip-nav)
+# Find a plan to power your apps.
 
-* Product[Product](/features)
-* Resources[Resources](/about)
-* [Pricing](/pricing)
-* [Customers](/customers)
-* [Now](/now)
-* [Contact](/contact)
+Vercel supports teams of all sizes, with pricing that scales.
 
-* [Docs](/docs)
-* [Open app](/login)
-* [Log in](/login)
-* [Sign up](/signup)
+Hobby
 
-# Pricing
+The perfect starting place for your web app or personal project.
 
-Use Linear for free with your whole team. Upgrade to enable unlimited issues, enhanced security controls, and additional features.
+**Free forever.**
 
-### Free
+Import your repo, deploy in seconds
 
-$0
+Automatic CI/CD
 
-Free for everyone
+Web Application Firewall
 
-* Unlimited members
-* 2 teams
-* 250 issues
-* [Slack](/integrations/slack) and [GitHub](/integrations/github)
-* [AI agents](/agents)
+Global, automated CDN
 
-[Get started](/signup)[Get started](/settings/plans)
+Fluid compute
 
-### Basic
+DDoS Mitigation
 
-$10 per user/month$10 per user/month$10 per user/month
+Traffic & performance insights
 
-Billed yearly
+[Start Deploying](/new)
 
-* All Free features +
-* 5 teams
-* Unlimited issues
-* Unlimited file uploads
-* Admin roles
+Popular
 
-[Get started](/signup)[Get started](/settings/plans)
+Pro
 
-### Business
+Popular
 
-$16 per user/month$16 per user/month$16 per user/month
+Everything you need to build and scale your app.
 
-Billed yearly
+**$20/mo** + additional usage
 
-* All Basic features +
-* Unlimited teams
-* Private teams and guests
-* [Triage Intelligence](/ai)
-* [Linear Insights](/insights)
-* [Linear Asks](/asks)
-* Issue SLAs
-* [Zendesk](/integrations/zendesk) and [Intercom](/integrations/intercom) integrations
+All Hobby features, plus:
 
-[Get started](/signup)[Get started](/settings/plans)or [contact sales](/contact/sales)
+$20 of included usage credit
 
-### Enterprise
+Advanced spend management
 
-[Contact us](/contact/sales)
+Team collaboration & free viewer seats
 
-Annual billing only
+Faster builds + no queues
 
-* All Business features +
-* Sub-initiatives
-* Advanced [Linear Asks](/asks)
-* Dashboards
-* SAML and SCIM
-* Advanced security
-* Migration and onboarding support
+Cold start prevention
 
-[Contact sales](/contact/sales)
+Enterprise add-ons
 
-Powering the world’s best product teams
-
-[Meet our customers](/customers)
-
-Free
-
-Basic
-
-Business
+[Start a free trial](/signup?plan=pro&next=/dashboard)
 
 Enterprise
 
-Change PlanFreeBasicBusinessEnterprise
+Critical security, performance, observability, platform SLAs, and support.
 
-Unlimited members
+All Pro features, plus:
 
-Unlimited members
+Guest & Team access controls
 
-Unlimited members
+SCIM & Directory Sync
 
-Unlimited members
+Managed WAF Rulesets
 
-10MB file uploads
+Multi-region compute & failover
 
-Unlimited file uploads
+99.99% SLA
 
-Unlimited file uploads
+Advanced Support
 
-Unlimited file uploads
+[Get a demo](https://vercel.com/contact/sales/pricing)[Request Trial](/contact/sales/enterprise-trial)
 
-250 issues
+**Get started with v0**. Generate quality UI, and ship applications end-to-end.
 
-Unlimited issues
+[Start building with v0](https://v0.dev)
 
-Unlimited issues
+Features
 
-Unlimited issues
+Hobby
 
-2 teams
+[Start Deploying](/new)
 
-5 teams
+Pro
 
-Unlimited teams
+[Start a free trial](/signup?plan=pro&next=/dashboard)
 
-Unlimited teams
+Enterprise
 
-Core features
+[Get a demo](https://vercel.com/contact/sales/pricing)
 
-Issues, projects, cycles, and initiatives
+HobbyProEnterprise
 
-Issues, projects, cycles, and initiatives
+[Start Deploying](/new)
 
-Issues, projects, cycles, and initiatives
+Managed Infrastructure
 
-Issues, projects, cycles, and initiatives
+### Vercel Delivery Network
 
-Customer requests
+Ultra-fast, secure by default global application delivery.
 
-Customer requests
+### Vercel Network
 
-Customer requests
+Global Points of Presence
 
-Customer requests
+Vercel Regions
 
-API and webhook access
+Automatic Routing
 
-API and webhook access
+HTTPS Certificates
 
-API and webhook access
+TLS/SSL Encryption
 
-API and webhook access
+Traffic Load Balancing
 
-Import and export
+Private Inter-Region Network
 
-Import and export
+Automatic Region Failover
 
-Import and export
+### Configurable Routing
 
-Import and export
+Reverse Proxy
 
-Triage
+Rewrites
 
-Triage
+Redirects
 
-Triage
+Middleware Support
 
-Triage
+[### Edge Requests](https://vercel.com/docs/pricing/networking#edge-requests)
 
-Pulse
+1M / month included
 
-Pulse
+10M / month included (up to $32 in value)
 
-Pulse
+then starting at $2 per 1M
 
-Pulse
+Custom
 
-Issue sync
+[### Fast Data Transfer](https://vercel.com/docs/pricing/networking#fast-data-transfer)
 
-Issue sync
+100 GB / month included
 
-Issue sync
+1TB / month included (up to $350 in value)
 
-Issue sync
+then starting at $0.15 per GB
 
-Issue SLAs
+Custom
 
-Issue SLAs
+[Regional pricing](https://vercel.com/docs/pricing/regional-pricing)
 
-Issue SLAs
+Managed Infrastructure
 
-Issue SLAs
+### Vercel Firewall
 
-Triage responsibility
+Customizable security to protect your applications.
 
-Triage responsibility
+### Web Application Firewall
 
-Triage responsibility
+Custom Firewall Rules
 
-Triage responsibility
+Up to 3
 
-Triage rules
+Up to 40
 
-Triage rules
+Up to 1,000
 
-Triage rules
+IP Blocking
 
-Triage rules
+Up to 3
 
-Sub-initiatives
+Up to 100
 
-Sub-initiatives
+Up to 1,000
 
-Sub-initiatives
+System Bypass Rules
 
-Sub-initiatives
+—
 
-AI and agent workflows
+Up to 25
 
-Agent platform
+Up to 100
 
-Agent platform
+Rate Limiting
 
-Agent platform
+1M allowed requests included / month
 
-Agent platform
+Starting at $0.50 per 1M allowed requests
 
-MCP access
+Custom
 
-MCP access
+OWASP Core Ruleset (managed)
 
-MCP access
+—
 
-MCP access
+—
 
-Linear Agent for Slack
+Custom
 
-Linear Agent for Slack
+### Bot Management
 
-Linear Agent for Slack
+Automated DDoS Mitigation
 
-Linear Agent for Slack
+AI Bots (managed ruleset)
 
-Triage Intelligence
+Bot Protection (managed ruleset)
 
-Triage Intelligence
+BotID
 
-Triage Intelligence
+Basic checks included
 
-Triage Intelligence
+$1 per 1,000 Deep Analysis checks
 
-Issue discussion summaries
+Custom
 
-Issue discussion summaries
+Attack Challenge Mode
 
-Issue discussion summaries
+[Regional pricing](https://vercel.com/docs/pricing/regional-pricing)
 
-Issue discussion summaries
+Managed Infrastructure
 
-Integrations
+### Content, Caching & Optimization
 
-Integrations
+Store and cache content close to your customers.
 
-Integrations
+### Content Delivery
 
-Integrations
+Zero-config CDN cache
 
-Integrations
+Automated Compression
 
-Support integrations
+Background Revalidation
 
-Support integrations
+Stale-While-Revalidate
 
-Support integrations
+### Incremental Static Regeneration (ISR)
 
-Support integrations
+ISR Reads
 
-Salesforce integration\*
+1M / month included
 
-Salesforce integration\*
+Starting at $0.40 per 1M
 
-Salesforce integration\*
+Custom
 
-Salesforce integration\*
+ISR Writes
 
-Team management
+200,000 / month included
 
-Sub-teams
+Starting at $4 per 1M
 
-Sub-teams
+Custom
 
-Sub-teams
+### Bulk Redirects
 
-Sub-teams
+1K included per project
 
-Private teams
+$50 per month per 25K redirects
 
-Private teams
+Custom
 
-Private teams
+### Blob
 
-Private teams
+Storage Size
 
-Guest accounts
+1 GB / month included
 
-Guest accounts
+$0.023 per GB
 
-Guest accounts
+Custom
 
-Guest accounts
+Simple Operations
 
-Analytics & Reporting
+10,000 / month included
 
-Progress reports
+$0.40 per 1M
 
-Progress reports
+Custom
 
-Progress reports
+Advanced Operations
 
-Progress reports
+2,000 / month included
 
-Insights
+$5.00 per 1M
 
-Insights
+Custom
 
-Insights
+Blob Data Transfer
 
-Insights
+10 GB / month included
 
-Dashboards
+Starting at $0.05 per GB
 
-Dashboards
+Custom
 
-Dashboards
+### Image Optimization
 
-Dashboards
+Image Transformations
 
-Data warehouse sync
+5,000 / month included
 
-Data warehouse sync
+Starting at $0.05 per 1K
 
-Data warehouse sync
+Custom
 
-Data warehouse sync
+Image Cache Reads
 
-Linear Asks
+300,000 / month included
 
-Slack intake
+Starting at $0.40 per 1M
 
-Slack intake
+Custom
 
-Slack intake
+Image Cache Writes
 
-Slack intake
+100,000 / month included
 
-Email intake
+Starting at $4.00 per 1M
 
-Email intake
+Custom
 
-Email intake
+### Edge Config
 
-Email intake
+Edge Config Reads
 
-Multiple Slack workspaces
+100,000 / month included
 
-Multiple Slack workspaces
+Starting at $3.00 per 1M reads
 
-Multiple Slack workspaces
+Custom
 
-Multiple Slack workspaces
+Edge Config Writes
 
-Private Slack channels
+100 writes / month included
 
-Private Slack channels
+$5.00 per 500 writes
 
-Private Slack channels
+Custom
 
-Private Slack channels
+### Microfrontends Support
 
-Per-channel configurations
+Microfrontends
 
-Per-channel configurations
+2 included projects
 
-Per-channel configurations
+2 included projects
 
-Per-channel configurations
+then $250 per additional project
 
-Security
+Custom
 
-Google SSO
+Microfrontend Routing
 
-Google SSO
+50K routed requests / month included
 
-Google SSO
+$2 per 1M routed requests
 
-Google SSO + SAML
+Custom
 
-Admin roles
+[Regional pricing](https://vercel.com/docs/pricing/regional-pricing)
 
-Admin roles
+Managed Infrastructure
 
-Admin roles
+### Vercel Compute
 
-Admin roles (Advanced)
+Dynamic, scalable functions to power your framework of choice. Now available with Fluid compute with [Active CPU pricing](https://vercel.com/blog/introducing-active-cpu-pricing-for-fluid-compute).
 
-Team owners
+### Vercel Functions
 
-Team owners
+Active CPU
 
-Team owners
+4 hours / month included
 
-Team owners
+Starting at $0.128 per hour
 
-Advanced authentication
+Custom
 
-Advanced authentication
+Provisioned Memory
 
-Advanced authentication
+360 GB-hrs / month included
 
-Advanced authentication
+Starting at $0.0106 per GB-Hour
 
-IP restrictions
+Custom
 
-IP restrictions
+Invocations
 
-IP restrictions
+1M / month included
 
-IP restrictions
+Starting at $0.60 per 1M
 
-SCIM provisioning
+Custom
 
-SCIM provisioning
+### Vercel Sandbox
 
-SCIM provisioning
+Active CPU
 
-SCIM provisioning
+5 hours / month included
 
-Domain claiming
+Starting at $0.128 per hour
 
-Domain claiming
+Custom
 
-Domain claiming
+Provisioned Memory
 
-Domain claiming
+420 GB-Hours / month included
 
-Audit log
+Starting at $0.0212 per GB-hr
 
-Audit log
+Custom
 
-Audit log
+Creation
 
-Audit log
+5,000 / month included
 
-Third-party app management
+Starting at $0.60 per 1M
 
-Third-party app management
+Custom
 
-Third-party app management
+Network
 
-Third-party app management
+20 GB / month included
 
-HIPAA compliance
+Starting at $0.15 per GB
 
-HIPAA compliance
+Custom
 
-HIPAA compliance
+Concurrent Sandboxes
 
-HIPAA compliance
+10
 
-Support
+2000
 
-Priority support
+Custom
 
-Priority support
+Sandbox Storage
 
-Priority support
+15 GB
 
-Priority support
+Starting at $0.08 per GB-month
 
-Account manager\*
+Custom
 
-Account manager\*
+[### Fast Origin Transfer](https://vercel.com/docs/pricing/networking#fast-origin-transfer)
 
-Account manager\*
+10 GB / month included
 
-Account manager\*
+Starting at $0.06 per GB
 
-Custom terms\*
+Custom
 
-Custom terms\*
+### Vercel Workflow
 
-Custom terms\*
+Beta
 
-Custom terms\*
+Steps
 
-Uptime SLA\*
+50,000 steps / month included
 
-Uptime SLA\*
+$2.50 per 100K
 
-Uptime SLA\*
+Custom
 
-Uptime SLA\*
+Storage
 
-[Get started](/signup)[Get started](/settings/plans)
+1 GB / month included
 
-[Get started](/signup)[Get started](/settings/plans)
+$0.00069 per GB-hour
 
-[Get started](/signup)[Get started](/settings/plans)or [contact sales](/contact/sales)
+Custom
 
-[Contact sales](/contact/sales)
+### Cron Jobs
 
-### Plan the present. Build the future.
+[Regional pricing](https://vercel.com/docs/pricing/regional-pricing)
 
-[Contact sales](/contact/sales)[Get started](/signup)[Download](/download)[Open app](/login)
+AI Cloud
 
-### Features
+### AI
 
-* [Plan](/plan)
-* [Build](/build)
-* [Insights](/insights)
-* [Customer Requests](/customer-requests)
-* [Linear Asks](/asks)
-* [Security](/security)
-* [Mobile](/mobile)
+Build, deploy, and scale AI features with secure inference, durable workflows, and intelligent assistance.
 
-### Product
+### Vercel Agent
 
-* [Pricing](/pricing)
-* [Method](/method)
-* [Integrations](/integrations)
-* [Changelog](/changelog)
-* [DocumentationDocs](/docs)
-* [Download](/download)
-* [Switch](/switch)
+Beta
 
-### Company
+$0.30 per action
 
-* [About](/about)
-* [Customers](/customers)
-* [Careers](/careers)
-* [Now](/now)
-* [README](/readme)
-* [Quality](/quality)
-* [Brand](/brand)
++ pass-through token cost
 
-### Resources
+Custom
 
-* [Developers](/developers)
-* [Status](https://linearstatus.com)
-* [Startups](/startups)
-* [Report vulnerability](/security/vulnerability)
-* [DPA](/dpa)
-* [Privacy](/privacy)
-* [Terms](/terms)
+Code Review
 
-### Connect
+—
 
-* [Contact us](/contact)
-* [Community](https://linear.app/join-slack)
-* [X (Twitter)](https://x.com/linear)
-* [GitHub](https://github.com/linear)
-* [YouTube](https://www.youtube.com/@linear)
+Investigations
+
+—
+
+### AI Gateway
+
+Observability
+
+Image generation
+
+Bring your own key
+
+App attribution
+
+Managed fallback
+
+Load balancing
+
+Spend monitoring
+
+Embedding support
+
+Automatic retries
+
+DX Platform
+
+### Build & Deploy
+
+Workflows from code to production.
+
+### Builds
+
+Automatic CI/CD
+
+Environment Variables
+
+Build Logs
+
+Remote Cache
+
+Monorepo Support
+
+Webhook Triggers
+
+—
+
+Custom Environments
+
+—
+
+1 environment
+
+12 environments
+
+### Build minutes
+
+Standard machines
+
+—
+
+Starting at $0.014 per minute
+
+Custom
+
+Enhanced machines
+
+—
+
+Starting at $0.028 per minute
+
+Custom
+
+Turbo machines
+
+—
+
+Starting at $0.126 per minute
+
+Custom
+
+### Deployments
+
+Unlimited Deployments
+
+Environment Variables
+
+Instant Rollback
+
+Multi-tenant support
+
+Skew Protection
+
+—
+
+Rolling Releases
+
+—
+
+1 project included
+
+Custom
+
+### Team Seats
+
+Developer seat
+
+1
+
+$20 / month
+
+Custom
+
+Viewer seat
+
+—
+
+Unlimited
+
+Custom
+
+Billing seat
+
+—
+
+1
+
+Custom
+
+### Vercel Toolbar
+
+Comments
+
+Layout Shift Tool
+
+Draft Mode
+
+Productivity Integrations
+
+Previewers
+
+—
+
+Unlimited
+
+Unlimited
+
+Accessibility Audit
+
+Flags Explorer
+
+150 overrides / month
+
+150 overrides / month
+
+then $250 for unlimited
+
+150 overrides / month
+
+then $250 for unlimited
+
+Managed Infrastructure
+
+### Observability
+
+Frontend observability on Vercel helps you monitor, analyze, and manage your applications.
+
+### Usage Dashboard
+
+[### Observability](https://vercel.com/docs/observability)
+
+### Observability Plus
+
+Add-on
+
+$10 / month
+
+$1.20 per 1M events
+
+Custom
+
+Extended retention
+
+—
+
+30 days
+
+30 days
+
+Advanced metrics
+
+—
+
+Query engine
+
+—
+
+AI query prompting
+
+—
+
+[### Speed Insights](https://vercel.com/docs/speed-insights)
+
+10,000 events / month included
+
+$10 / project / month
+
+$0.65 per 10,000 events
+
+Custom
+
+[### Web Analytics](https://vercel.com/docs/analytics)
+
+50,000 events / month included
+
+$3 per 100,000 events
+
+Custom
+
+### Web Analytics Plus
+
+Add-on
+
+$10 / month
+
+Reporting windows
+
+Additional 12 months (24 total)
+
+24 months
+
+UTM Parameters
+
+[### Runtime Logs](https://vercel.com/docs/observability/runtime-logs)
+
+1 hour of logs
+
+1 day of logs
+
+30 days with Observability Plus
+
+3 days of logs
+
+30 days with Observability Plus
+
+[### Session Tracing](https://vercel.com/docs/session-tracing)
+
+1 hour of traces
+
+1 day of traces
+
+3 days of traces
+
+[### Log Drains](https://vercel.com/docs/observability/log-drains)
+
+—
+
+$0.50 per 1 GB
+
+Custom
+
+[Regional pricing](https://vercel.com/docs/pricing/regional-pricing)
+
+Security & Privacy
+
+### Access & Deployment Security
+
+Vercel protects your projects across access, application, and infrastructure security.
+
+### OAuth Sign-in
+
+GitHub
+
+Google
+
+GitLab
+
+Bitbucket
+
+### Access Security
+
+Multi-Factor Authentication (MFA)
+
+Role-Based Access Control
+
+—
+
+Team level
+
+Team & project level
+
+Audit Logs
+
+—
+
+—
+
+SAML Single Sign-On (SSO)
+
+—
+
+$300 / month
+
+Directory Sync (SCIM)
+
+—
+
+—
+
+### Advanced Deployment Protection
+
+—
+
+$150 / month
+
+### SSO Protected Previews
+
+—
+
+—
+
+[### Static IPs (shared pool)](https://vercel.com/docs/connectivity/static-ips)
+
+—
+
+$100 / project / month
+
+Starting at $0.15 per GB
+
+Custom
+
+[### Secure Compute](https://vercel.com/docs/connectivity/secure-compute)
+
+—
+
+—
+
+Custom
+
+Security & Privacy
+
+### Compliance
+
+Built-in support for global security and data protection standards. Security collateral available for Pro and Enterprise plans.
+
+### Compliance
+
+SOC 2 Type 2
+
+PCI DSS
+
+ISO 27001
+
+EU-U.S. DPF
+
+HIPAA BAA
+
+—
+
+$350 / month
+
+Custom
+
+TISAX
+
+Custom Security Questionnaire
+
+—
+
+—
+
+ISO 27001
+
+SOC 2
+
+PCI DSS
+
+HIPAA
+
+GDPR
+
+DPF
+
+**Looking for even more scale?** Get a trial from the Vercel team.
+
+[Get an Enterprise Trial](https://vercel.com/contact/sales/enterprise-trial)
+
+### Frequently asked questions.
+
+Which Vercel plan is right for me?
+
+Our Hobby plan is for personal, non-commercial use. Pro is designed for professional developers, freelancers, and businesses who need enhanced features and team collaboration. Enterprise is for teams seeking greater performance, collaboration, and security. [Contact our sales team](https://vercel.com/contact/sales) to learn more.
+
+Do you offer custom invoicing?
+
+Yes, we offer custom invoicing for Enterprise customers. [Contact our sales team](https://vercel.com/contact/sales) to learn more.
+
+What are the limits for each plan?
+
+Our limits are listed [here](https://vercel.com/docs/platform/limits). Pro plans have a $20 included credit to use across resources. Finally, check out our [Fair Use Policy](https://vercel.com/docs/limits/fair-use-guidelines).
+
+I went over my included credit. What can I do?
+
+We are glad you are growing with Vercel! You can continue to self serve or [contact us](https://vercel.com/contact/sales) to discuss your requirements and we can customize a plan for your team.
+
+Can I buy additional usage?
+
+Yes! On top of your included credit on Pro, you can pay as you go, uncapped. If you have a free Hobby account, you are limited to the usage caps and cannot purchase additional usage. Read more details [in our documentation](https://vercel.com/docs/pricing#regional-pricing).
+
+I have a Hobby account, how do I upgrade to a paid plan?
+
+Thanks for continuing to use Vercel! You can upgrade to Pro directly in the Vercel dashboard.
+
+Is there a limit to how many teams I can have?
+
+No, there is not a limit.
+
+How does Vercel calculate usage?
+
+Learn more about usage in our [documentation](https://vercel.com/docs/platform/usage).
+
+I want to transfer a domain name to Vercel. Is there a fee?
+
+Potentially. Transfer fees are dependent on the TLD and the domain renewal fee. The domain-transfer workflow will alert you of fees before initiating transfer.
+
+Do cached responses affect usage?
+
+Caching responses can reduce the usage of Vercel Functions.  
+If the function response is [cached](https://vercel.com/docs/edge-network/caching), it will not run and incur a Function invocation or any GB/hrs of duration. Any request made to Vercel will incur an Edge Request. Requests to static assets incur the same Fast Data Transfer usage if the response is cached or uncached.  
+Further, Vercel automatically adds etags to all responses to prevent end users from downloading the same asset many times. Our Edge Network automatically [compresses](https://vercel.com/docs/edge-network/compression) responses to reduce your Fast Data Transfer.
+
+How can I manage my spend?
+
+We provide customers with tools to observe, control, and alert on their infrastructure spend with [Spend Management](https://vercel.com/blog/introducing-spend-management-realtime-usage-alerts-sms-notifications).
+
+All new teams have a default on-demand usage budget of $200 (which can be customized) and receive email, web, and SMS notifications as you reach that amount. When reaching 100%, you can optionally configure Vercel to automatically pause all projects with a hard limit.
+
+Over the past year, we've added features to the platform based on your feedback to help automatically prevent runaway spend, including [recursion protection](https://vercel.com/changelog/automatic-recursion-protection-for-vercel-serverless-functions), [improved function defaults](https://vercel.com/changelog/serverless-functions-can-now-run-up-to-5-minutes), [hard spend limits](https://vercel.com/changelog/improved-hard-caps-for-spend-management), [Attack Challenge Mode](https://vercel.com/changelog/prevent-malicious-traffic-with-attack-challenge-mode-for-vercel-firewall), and more.
+
+**Not sure which plan to pick?** Discuss *Pro* or Enterprise needs with us, learn about custom pricing, or get a demo.
+
+[Schedule a Demo](https://vercel.com/contact/sales/pricing)
+
+**Vercel Enterprise drove 264% ROI.** Boost velocity and increase conversions.
+
+[Read about our ROI study](/roi)
+
+Products
+
+[v0
+
+Build applications with AI](https://v0.app)
+
+[AI SDK
+
+The AI Toolkit for TypeScript](https://sdk.vercel.ai/)
+
+[AI Gateway
+
+One endpoint, all your models](/ai-gateway)
+
+[Vercel Agent
+
+An agent that knows your stack](/agent)
+
+[Sandbox
+
+AI workflows in live environments](/sandbox)
+
+[CI/CD
+
+Helping teams ship 6× faster](/products/previews)
+
+[Content Delivery
+
+Fast, scalable, and reliable](/products/rendering)
+
+[Fluid Compute
+
+Servers, in serverless form](/fluid)
+
+[Observability
+
+Trace every step](/products/observability)
+
+[Bot Management
+
+Scalable bot protection](/security/bot-management)
+
+[BotID
+
+Invisible CAPTCHA](/botid)
+
+[Platform Security
+
+DDoS Protection, Firewall](/security)
+
+[Web Application Firewall
+
+Granular, custom protection](/security/web-application-firewall)
+
+Resources
+
+[Customers
+
+Trusted by the best teams](/customers)
+
+[Blog
+
+The latest posts and changes](/blog)
+
+[Changelog
+
+See what shipped](/changelog)
+
+[Press
+
+Read the latest news](/press)
+
+[Events
+
+Join us at an event](/events)
+
+[Docs
+
+Vercel documentation](/docs)
+
+[Academy
+
+Linear courses to level up](/academy)
+
+[Knowledge Base
+
+Find help quickly](/kb)
+
+[Community
+
+Join the conversation](https://community.vercel.com/)
+
+[Next.js
+
+The native Next.js platform](/frameworks/nextjs)
+
+[Nuxt
+
+The progressive web framework](https://nuxt.com/)
+
+[Svelte
+
+The web’s efficient UI framework](https://svelte.dev/)
+
+[Turborepo
+
+Speed with Enterprise scale](/solutions/turborepo)
+
+Solutions
+
+[AI Apps
+
+Deploy at the speed of AI](/ai)
+
+[Composable Commerce
+
+Power storefronts that convert](/solutions/composable-commerce)
+
+[Marketing Sites
+
+Launch campaigns fast](/solutions/marketing-sites)
+
+[Multi-tenant Platforms
+
+Scale apps with one codebase](/solutions/multi-tenant-saas)
+
+[Web Apps
+
+Ship features, not infrastructure](/solutions/web-apps)
+
+[Marketplace
+
+Extend and automate workflows](/marketplace)
+
+[Templates
+
+Jumpstart app development](/templates)
+
+[Partner Finder
+
+Get help from solution partners](/partners/solution-partners)
+
+[Platform Engineers
+
+Automate away repetition](/solutions/platform-engineering)
+
+[Design Engineers
+
+Deploy for every idea](/solutions/design-engineering)

@@ -1,9 +1,11 @@
 import os
 import json
 import asyncio
+import re
 import datetime
 import urllib.parse
 import requests
+from bs4 import BeautifulSoup, Comment
 from google import genai
 from google.genai import types
 from markdownify import markdownify as mdify
@@ -17,21 +19,34 @@ try:
     import waybackpy
 except Exception:
     waybackpy = None
-
+    
 try:
     import aiohttp
 except Exception:
     aiohttp = None
-
-
+    
 from dotenv import load_dotenv
-load_dotenv(override=True)
+load_dotenv()
 
+# --- Helper: Save Prompt to File (Restored) ---
+def _save_prompt_to_file(label: str, content: str):
+    """
+    Saves the full prompt context to a file for debugging.
+    """
+    try:
+        os.makedirs("saved_prompts", exist_ok=True)
+        timestamp = datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ")
+        # specific hash to avoid overwrites if multiple calls happen fast
+        filename = f"saved_prompts/{timestamp}_{label}_{abs(hash(content)) % 100000000}.txt"
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(content)
+        return filename
+    except Exception as e:
+        print(f"Warning: Failed to save prompt log: {e}")
+        return None
 
-
-# --- Helper to load prompt text from files ---
+# --- Helper: Load Prompt Text ---
 def _load_prompt_text(filepath: str) -> str:
-    """Reads the prompt content from a file."""
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             return f.read().strip()
@@ -42,40 +57,111 @@ def _load_prompt_text(filepath: str) -> str:
     except Exception as e:
         return f"Error loading prompt: {e}"
 
+# --- Helper: Clean JSON Output ---
+def _clean_json_text(text: str) -> str:
+    """
+    Robust cleaning: Strips Markdown AND finds the first/last brace
+    to extract valid JSON from chatty LLM responses.
+    """
+    if not text:
+        return "{}"
+    
+    # 1. Strip Markdown code blocks
+    text = re.sub(r"^```json\s*", "", text, flags=re.MULTILINE)
+    text = re.sub(r"^```\s*", "", text, flags=re.MULTILINE)
+    text = re.sub(r"```$", "", text, flags=re.MULTILINE)
+    
+    # 2. Find the JSON object (first '{' to last '}')
+    start = text.find('{')
+    end = text.rfind('}')
+    
+    if start != -1 and end != -1:
+        text = text[start:end+1]
+    
+    return text.strip()
 
-# --- Step 1: Normalize Raw Data (Async) ---
-async def _analyze_single_state(client: genai.Client, model_id: str, markdown_text: str | None, label: str, prompt_file: str) -> dict:
-    if not markdown_text:
-        return {"error": f"No data available for {label} state", "available": False}
+# --- Helper: Auto-Retry & Config Manager ---
+async def _call_gemini_with_retry(client, model_id, contents, system_instruction, retries=3):
+    is_gemma = "gemma" in model_id.lower()
+    config_params = {"system_instruction": system_instruction}
+    if not is_gemma:
+        config_params["response_mime_type"] = "application/json"
+    config = types.GenerateContentConfig(**config_params)
 
-    # Load the specific prompt for state extraction
-    system_instruction = _load_prompt_text(prompt_file)
-
-    # We inject the raw data into the user message
-    user_payload = f"""
-    === RAW DATA ({label.upper()}) ===
-    {markdown_text[:20000]} 
-    """  # 20k chars context window safety
-
-    try:
-        response = await client.aio.models.generate_content(
-            model=model_id,
-            contents=user_payload,
-            config=types.GenerateContentConfig(
-                system_instruction=system_instruction,
-                response_mime_type="application/json"
+    for attempt in range(retries):
+        try:
+            response = await client.aio.models.generate_content(
+                model=model_id,
+                contents=contents,
+                config=config
             )
-        )
-        return json.loads(response.text)
-    except Exception as e:
-        return {"error": f"Failed to analyze {label}: {str(e)}"}
+            clean_text = _clean_json_text(response.text)
+            try:
+                return json.loads(clean_text)
+            except json.JSONDecodeError:
+                return {"error": "JSON Parse Failed", "raw_text": clean_text[:500]}
+        except Exception as e:
+            error_str = str(e)
+            if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+                wait_time = (2 ** attempt) * 2
+                print(f"⚠️  Quota limit hit. Retrying in {wait_time}s...")
+                await asyncio.sleep(wait_time)
+            else:
+                print(f"❌ API Error: {error_str}")
+                return {"error": error_str}
+    return {"error": "Max retries exceeded."}
 
+# --- NEW: Smart HTML Cleaner ---
+def _clean_html(html_content: str) -> str:
+    if not html_content:
+        return ""
+    
+    soup = BeautifulSoup(html_content, "html.parser")
+    
+    # Kill Scripts, Styles, etc.
+    for tag in soup(["script", "style", "noscript", "iframe", "svg"]):
+        tag.decompose()
 
-# --- Step 2: Synthesize the Diff (Async) ---
-async def _synthesize_diff(client: genai.Client, model_id: str, old_state: dict, new_state: dict, prompt_file: str) -> dict:
-    # Load the specific prompt for comparison
+    # Kill Comments
+    for comment in soup.find_all(string=lambda text: isinstance(text, Comment)):
+        comment.extract()
+
+    # Kill Navigation & Footers
+    for tag in soup(["nav", "footer", "header", "aside"]):
+        tag.decompose()
+
+    return str(soup)
+
+# --- Analysis Step (With Logging) ---
+async def _analyze_single_state(client, model_id, markdown_text, label, prompt_file):
+    if not markdown_text:
+        return {"error": f"No data available for {label} state"}
+
     system_instruction = _load_prompt_text(prompt_file)
+    
+    # Smart Truncation
+    if len(markdown_text) > 25000:
+        cleaned_md = markdown_text[:15000] + "\n\n...[TRUNCATED MIDDLE]...\n\n" + markdown_text[-5000:]
+    else:
+        cleaned_md = markdown_text
 
+    user_payload = f"=== RAW DATA ({label.upper()}) ===\n{cleaned_md}" 
+
+    # LOGGING RESTORED: Save the inputs to a file
+    log_content = f"SYSTEM_INSTRUCTION:\n{system_instruction}\n\nUSER_PAYLOAD:\n{user_payload}"
+    _save_prompt_to_file(f"state_{label}", log_content)
+
+    return await _call_gemini_with_retry(client, model_id, user_payload, system_instruction)
+
+# --- Step 2: Synthesize Diff (With Logging) ---
+async def _synthesize_diff(client, model_id, old_state, new_state, prompt_file):
+    if "error" in old_state or "error" in new_state:
+        return {
+            "error": "Comparison aborted due to failure in state analysis.", 
+            "details": {"old": old_state.get("error"), "new": new_state.get("error")}
+        }
+
+    system_instruction = _load_prompt_text(prompt_file)
     user_payload = f"""
     === PREVIOUS STATE (JSON) ===
     {json.dumps(old_state, indent=2)}
@@ -83,93 +169,50 @@ async def _synthesize_diff(client: genai.Client, model_id: str, old_state: dict,
     === CURRENT STATE (JSON) ===
     {json.dumps(new_state, indent=2)}
     """
+    
+    # LOGGING RESTORED
+    log_content = f"SYSTEM_INSTRUCTION:\n{system_instruction}\n\nUSER_PAYLOAD:\n{user_payload}"
+    _save_prompt_to_file("diff", log_content)
 
-    try:
-        response = await client.aio.models.generate_content(
-            model=model_id,
-            contents=user_payload,
-            config=types.GenerateContentConfig(
-                system_instruction=system_instruction,
-                response_mime_type="application/json"
-            )
-        )
-        return json.loads(response.text)
-    except Exception as e:
-        return {"error": f"Diff failed: {str(e)}"}
+    return await _call_gemini_with_retry(client, model_id, user_payload, system_instruction)
 
-
-# --- Scraping Helpers (Existing logic preserved) ---
-
-async def _fetch_with_crawl4ai(url: str) -> str | None:
-    try:
-        if hasattr(crawl4ai, "scrape"):
-            return await crawl4ai.scrape(url)
-        if hasattr(crawl4ai, "crawl"):
-            return await crawl4ai.crawl(url)
-        if hasattr(crawl4ai, "Client"):
-            client = crawl4ai.Client()
-            if hasattr(client, "fetch"):
-                return await client.fetch(url)
-    except Exception:
-        return None
-    return None
-
-
+# --- Scraping Helpers (Fixed User-Agent) ---
 async def _fetch_with_aiohttp(url: str) -> str:
+    headers = {"User-Agent": "sentinel-probe/1.0"} 
     if not aiohttp:
-        # Fallback to synchronous requests if aiohttp missing (not ideal but safe)
-        return requests.get(url, headers={"User-Agent": "sentinel/1.0"}).text
-
-    headers = {"User-Agent": "sentinel-probe/1.0"}
+        return requests.get(url, headers=headers).text
+    
     timeout = aiohttp.ClientTimeout(total=30)
     async with aiohttp.ClientSession(headers=headers, timeout=timeout) as session:
         async with session.get(url) as resp:
             resp.raise_for_status()
             return await resp.text()
 
-
 async def get_current_state(url: str) -> str:
-    html = None
-    if crawl4ai:
-        try:
-            html = await _fetch_with_crawl4ai(url)
-        except Exception:
-            html = None
-    if not html:
-        html = await _fetch_with_aiohttp(url)
-    md = mdify(html, heading_style="ATX")
-    return md
-
-
-def _timestamp_months_ago(months: int) -> str:
-    now = datetime.datetime.utcnow()
-    approx = now - datetime.timedelta(days=30 * months)
-    return approx.strftime("%Y%m%d")
-
+    html = await _fetch_with_aiohttp(url)
+    clean_html = _clean_html(html)
+    return mdify(clean_html, heading_style="ATX", strip=['img'])
 
 def get_historical_state(url: str, months_ago: int) -> tuple[str | None, str | None]:
-    # This remains synchronous because 'requests' and 'waybackpy' are sync.
-    # The API wrapper handles this in a thread executor.
-    timestamp = _timestamp_months_ago(months_ago)
+    timestamp = (datetime.datetime.utcnow() - datetime.timedelta(days=30 * months_ago)).strftime("%Y%m%d")
     ua = "sentinel-probe/1.0"
-
-    # 1. Try Waybackpy wrapper
+    
+    # 1. Try Waybackpy
     if waybackpy:
         try:
             from waybackpy import WaybackMachineAvailabilityAPI
             api = WaybackMachineAvailabilityAPI(url, ua)
-            closest = api.near(year=int(timestamp[:4]), month=int(
-                timestamp[4:6]), day=int(timestamp[6:8]))
+            closest = api.near(year=int(timestamp[:4]), month=int(timestamp[4:6]), day=int(timestamp[6:8]))
             if closest and closest.archive_url:
-                r = requests.get(closest.archive_url, headers={
-                                 "User-Agent": ua}, timeout=30)
-                return mdify(r.text, heading_style="ATX"), closest.archive_url
+                r = requests.get(closest.archive_url, headers={"User-Agent": ua}, timeout=30)
+                clean_html = _clean_html(r.text)
+                return mdify(clean_html, heading_style="ATX", strip=['img']), closest.archive_url
         except Exception:
             pass
 
     # 2. Try Raw API
     api_url = (
-        "https://archive.org/wayback/available?url="
+        "[https://archive.org/wayback/available?url=](https://archive.org/wayback/available?url=)"
         + urllib.parse.quote(url, safe="")
         + "&timestamp="
         + timestamp
@@ -180,40 +223,34 @@ def get_historical_state(url: str, months_ago: int) -> tuple[str | None, str | N
         snap = j.get("archived_snapshots", {}).get("closest")
         if not snap:
             return None, None
+        
         snapshot_url = snap.get("url")
         r2 = requests.get(snapshot_url, headers={"User-Agent": ua}, timeout=30)
-        return mdify(r2.text, heading_style="ATX"), snapshot_url
+        clean_html = _clean_html(r2.text)
+        return mdify(clean_html, heading_style="ATX", strip=['img']), snapshot_url
     except Exception:
         return None, None
 
-
 # --- Main Orchestrator ---
-
-async def analyze_diff(old_md: str | None, new_md: str | None,
-                       state_prompt_path: str = "prompt_state.yaml",
+async def analyze_diff(old_md: str | None, new_md: str | None, 
+                       state_prompt_path: str = "prompt_state.yaml", 
                        diff_prompt_path: str = "prompt_diff.yaml") -> dict:
-
+    
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         return {"error": "GEMINI_API_KEY not set"}
 
     client = genai.Client(api_key=api_key)
-    model_id = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    model_id = os.getenv("GEMINI_MODEL", "gemma-3-27b-it") 
 
-    print(
-        f"--- Sentinel: Reading prompts from {state_prompt_path} and {diff_prompt_path} ---")
+    print(f"--- Sentinel: Using Model {model_id} ---")
 
-    # 1. Run State Analysis in Parallel
     print("--- Sentinel: Analyzing States ---")
-    task_old = _analyze_single_state(
-        client, model_id, old_md, "historical", state_prompt_path)
-    task_new = _analyze_single_state(
-        client, model_id, new_md, "current", state_prompt_path)
+    task_old = _analyze_single_state(client, model_id, old_md, "historical", state_prompt_path)
+    task_new = _analyze_single_state(client, model_id, new_md, "current", state_prompt_path)
+    
+    old_struct, new_struct = await asyncio.gather(task_old, task_new)
 
-    results = await asyncio.gather(task_old, task_new)
-    old_struct, new_struct = results
-
-    # 2. Run Strategy Diff
     print("--- Sentinel: Synthesizing Diff ---")
     diff_struct = await _synthesize_diff(client, model_id, old_struct, new_struct, diff_prompt_path)
 
