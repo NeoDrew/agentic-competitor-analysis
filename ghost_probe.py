@@ -20,8 +20,8 @@ HEADERS = {
 # ATS patterns to detect
 ATS_PATTERNS = {
     'greenhouse': [
-        r'boards\.greenhouse\.io/[\w-]+',
         r'job-boards\.greenhouse\.io/[\w-]+',
+        r'boards\.greenhouse\.io/[\w-]+',
     ],
     'lever': [
         r'jobs\.lever\.co/[\w-]+',
@@ -183,9 +183,21 @@ def _fetch_ashby_api(ats_url: str) -> list[dict]:
         resp.raise_for_status()
         data = resp.json()
 
-        job_board = data.get('data', {}).get('jobBoard', {})
-        job_postings = job_board.get('jobPostings', [])
-        teams = {t['id']: t['name'] for t in job_board.get('teams', [])}
+        job_board = data.get('data', {}).get('jobBoard')
+        if not job_board:
+            # Company doesn't exist on Ashby
+            return []
+
+        job_postings = job_board.get('jobPostings') or []
+        teams_list = job_board.get('teams') or []
+        # Clean team names - remove numeric prefixes like "32010 "
+        teams = {}
+        for t in teams_list:
+            if t.get('id') and t.get('name'):
+                name = t['name']
+                # Remove leading numeric IDs (e.g., "32010 Backend Engineering" -> "Backend Engineering")
+                name = re.sub(r'^\d+\s+', '', name)
+                teams[t['id']] = name
 
         jobs = []
         for posting in job_postings:
@@ -198,7 +210,7 @@ def _fetch_ashby_api(ats_url: str) -> list[dict]:
                 jobs.append(job)
 
         return jobs
-    except (requests.RequestException, json.JSONDecodeError, KeyError) as e:
+    except (requests.RequestException, json.JSONDecodeError, KeyError, TypeError) as e:
         print(f"Ashby API request failed: {e}")
         return []
 
@@ -207,52 +219,91 @@ def _parse_greenhouse(soup: BeautifulSoup) -> list[dict]:
     """Parse Greenhouse job board HTML."""
     jobs = []
 
-    # Greenhouse uses <div class="opening"> for each job
+    # Method 1: Classic Greenhouse structure (div class="opening")
     for opening in soup.find_all('div', class_='opening'):
         job = {}
-
-        # Title is in an <a> tag
         title_link = opening.find('a')
         if title_link:
             job['title'] = title_link.get_text(strip=True)
 
-        # Location is often in a <span class="location">
         location = opening.find('span', class_='location')
-        if location:
-            job['location'] = location.get_text(strip=True)
-        else:
-            job['location'] = 'Not specified'
+        job['location'] = location.get_text(strip=True) if location else 'Not specified'
 
-        # Department might be in parent section
         parent_section = opening.find_parent('section')
         if parent_section:
             dept_header = parent_section.find(['h2', 'h3', 'h4'])
-            if dept_header:
-                job['department'] = dept_header.get_text(strip=True)
-            else:
-                job['department'] = 'General'
+            job['department'] = dept_header.get_text(strip=True) if dept_header else 'General'
         else:
             job['department'] = 'General'
 
         if job.get('title'):
             jobs.append(job)
 
-    # Alternative Greenhouse structure (newer boards)
-    if not jobs:
-        for posting in soup.find_all('div', class_=re.compile(r'job|posting|position', re.I)):
-            job = {}
-            title = posting.find(
-                ['a', 'h3', 'h4'], class_=re.compile(r'title|name', re.I))
-            if title:
-                job['title'] = title.get_text(strip=True)
-            location = posting.find(class_=re.compile(r'location', re.I))
-            job['location'] = location.get_text(
-                strip=True) if location else 'Not specified'
-            dept = posting.find(class_=re.compile(r'department|team', re.I))
-            job['department'] = dept.get_text(
-                strip=True) if dept else 'General'
-            if job.get('title'):
+    if jobs:
+        return jobs
+
+    # Method 2: New job-boards.greenhouse.io structure
+    # Jobs are links to /jobs/{id} grouped under department headings
+    # Filter out navigation/category links
+    skip_titles = {
+        'apply', 'view', 'see all', 'all open positions', 'see all open positions',
+        'view all', 'learn more', 'read more', 'careers', 'jobs', 'home',
+        'about', 'benefits', 'culture', 'teams', 'locations'
+    }
+
+    current_dept = 'General'
+    for element in soup.find_all(['h2', 'h3', 'h4', 'a']):
+        if element.name in ['h2', 'h3', 'h4']:
+            # Department header
+            current_dept = element.get_text(strip=True)
+        elif element.name == 'a':
+            href = element.get('href', '')
+            # Job links contain /jobs/{numeric_id} in the path
+            if re.search(r'/jobs/\d+', href):
+                title = element.get_text(strip=True)
+                title_lower = title.lower()
+
+                # Skip navigation links and categories
+                if len(title) < 10:
+                    continue
+                if title_lower in skip_titles:
+                    continue
+                if any(skip in title_lower for skip in skip_titles):
+                    continue
+                # Skip if it looks like an office location (short name, no role keywords)
+                role_keywords = ['engineer', 'manager', 'director', 'analyst', 'designer',
+                                 'developer', 'lead', 'head', 'specialist', 'coordinator']
+                if len(title.split()) <= 3 and not any(kw in title_lower for kw in role_keywords):
+                    continue
+
+                job = {
+                    'title': title,
+                    'department': current_dept,
+                    'location': 'Not specified'
+                }
+                # Try to find location near the link
+                next_sibling = element.find_next_sibling()
+                if next_sibling and next_sibling.get_text(strip=True):
+                    loc_text = next_sibling.get_text(strip=True)
+                    if len(loc_text) < 100:  # Likely location, not description
+                        job['location'] = loc_text
                 jobs.append(job)
+
+    if jobs:
+        return jobs
+
+    # Method 3: Generic fallback - divs with job-related classes
+    for posting in soup.find_all('div', class_=re.compile(r'job|posting|position', re.I)):
+        job = {}
+        title = posting.find(['a', 'h3', 'h4'], class_=re.compile(r'title|name', re.I))
+        if title:
+            job['title'] = title.get_text(strip=True)
+        location = posting.find(class_=re.compile(r'location', re.I))
+        job['location'] = location.get_text(strip=True) if location else 'Not specified'
+        dept = posting.find(class_=re.compile(r'department|team', re.I))
+        job['department'] = dept.get_text(strip=True) if dept else 'General'
+        if job.get('title'):
+            jobs.append(job)
 
     return jobs
 

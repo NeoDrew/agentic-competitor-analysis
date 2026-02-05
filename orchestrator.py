@@ -13,6 +13,9 @@ import os
 import time
 from datetime import datetime
 
+from google import genai
+from google.genai import types
+
 from discovery import suggest_competitors, find_company_links, try_common_ats_urls
 from ghost_probe import detect_ats, fetch_jobs, analyze_hiring_trends
 from sentinel_probe import get_current_state, get_historical_state, analyze_diff
@@ -127,6 +130,163 @@ def _generate_hiring_summary(company: str, total: int, depts: list, signals: lis
     return " ".join(lines)
 
 
+async def generate_executive_summary(result: dict, max_retries: int = 5) -> str:
+    """
+    Evaluator Agent: Generates a detailed 150-250 word executive summary
+    synthesizing all competitive intelligence for a competitor.
+
+    Args:
+        result: Dict containing pricing_analysis, hiring_analysis, hiring_trends
+        max_retries: Maximum retry attempts for API errors
+
+    Returns:
+        Detailed executive summary string
+    """
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return "Unable to generate executive summary: API key not configured."
+
+    client = genai.Client(api_key=api_key)
+    model_id = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+
+    name = result.get('name', 'Unknown')
+    pricing = result.get('pricing_analysis', {})
+    hiring = result.get('hiring_analysis', {})
+    trends = result.get('hiring_trends', {})
+
+    # Build context for the evaluator
+    context_parts = [f"Company: {name}"]
+
+    # Pricing context
+    if pricing and isinstance(pricing, dict):
+        old_state = pricing.get('old_state', {})
+        new_state = pricing.get('new_state', {})
+        analysis = pricing.get('analysis', {})
+
+        if old_state or new_state:
+            context_parts.append("\n=== PRICING DATA ===")
+
+            # Old pricing
+            if old_state:
+                old_plans = old_state.get('pricing_plans', [])
+                if old_plans:
+                    plans_str = ", ".join([f"{p.get('name', 'N/A')}: {p.get('price', 'N/A')}" for p in old_plans[:5]])
+                    context_parts.append(f"6 months ago: {plans_str}")
+                old_tagline = old_state.get('tagline', '')
+                if old_tagline:
+                    context_parts.append(f"Previous positioning: {old_tagline}")
+
+            # New pricing
+            if new_state:
+                new_plans = new_state.get('pricing_plans', [])
+                if new_plans:
+                    plans_str = ", ".join([f"{p.get('name', 'N/A')}: {p.get('price', 'N/A')}" for p in new_plans[:5]])
+                    context_parts.append(f"Current: {plans_str}")
+                new_tagline = new_state.get('tagline', '')
+                if new_tagline:
+                    context_parts.append(f"Current positioning: {new_tagline}")
+
+            # Analysis insights
+            if analysis:
+                change_detected = analysis.get('change_detected', False)
+                context_parts.append(f"Pricing changed: {'Yes' if change_detected else 'No'}")
+
+                evidence = analysis.get('evidence', {})
+                if evidence:
+                    for key, val in evidence.items():
+                        if val and val != 'N/A':
+                            context_parts.append(f"  {key}: {val}")
+
+    # Hiring context
+    if hiring and isinstance(hiring, dict):
+        context_parts.append("\n=== HIRING DATA ===")
+        total_jobs = hiring.get('total_jobs', 0)
+        context_parts.append(f"Total open positions: {total_jobs}")
+
+        top_depts = hiring.get('top_departments', [])
+        if top_depts:
+            depts_str = ", ".join([f"{d['name']} ({d['count']})" for d in top_depts[:5]])
+            context_parts.append(f"Top departments: {depts_str}")
+
+        signals = hiring.get('strategic_signals', [])
+        if signals:
+            signals_str = ", ".join([f"{s['category']} ({s['count']} roles, {s['percent']}%)" for s in signals[:4]])
+            context_parts.append(f"Strategic signals: {signals_str}")
+
+    # Trends context
+    if trends and isinstance(trends, dict):
+        context_parts.append("\n=== HIRING TRENDS ===")
+        velocity = trends.get('velocity_change_percent', 0)
+        old_count = trends.get('old_count', 0)
+        new_count = trends.get('new_count', 0)
+        context_parts.append(f"Hiring velocity change: {velocity:+.0f}% ({old_count} → {new_count} roles)")
+
+        new_roles = trends.get('new_roles', [])
+        if new_roles:
+            roles_str = ", ".join([r.get('title', '')[:50] for r in new_roles[:5]])
+            context_parts.append(f"New roles added: {roles_str}")
+
+    context = "\n".join(context_parts)
+
+    # Evaluator prompt
+    system_instruction = """You are a senior competitive intelligence analyst writing executive briefings for C-level executives.
+
+Your task is to synthesize all available data into a compelling, insight-rich executive summary.
+
+Guidelines:
+- Write 150-250 words (this is critical - not too short, not too long)
+- Lead with the most important strategic insight
+- Be specific with data points (numbers, percentages, changes)
+- Identify strategic implications and potential threats/opportunities
+- Use confident, direct language appropriate for executive audiences
+- Do NOT use bullet points - write in flowing paragraphs
+- Do NOT include headers or sections - one cohesive summary
+- Avoid vague statements - be specific and actionable
+- If data is limited, acknowledge it but still provide value from what's available"""
+
+    user_prompt = f"""Write an executive summary for the following competitive intelligence on {name}:
+
+{context}
+
+Remember: 150-250 words, flowing paragraphs, lead with the key insight, be specific with data."""
+
+    config = types.GenerateContentConfig(
+        system_instruction=system_instruction
+    )
+
+    retryable_errors = ['429', '503', 'RESOURCE_EXHAUSTED', 'UNAVAILABLE', 'overloaded']
+
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model=model_id,
+                contents=user_prompt,
+                config=config
+            )
+            summary = response.text.strip()
+
+            # Basic validation
+            word_count = len(summary.split())
+            if word_count < 50:
+                return f"Analysis shows limited strategic changes for {name}. Insufficient data available for detailed assessment."
+
+            return summary
+
+        except Exception as e:
+            error_str = str(e)
+            is_retryable = any(code in error_str for code in retryable_errors)
+
+            if is_retryable and attempt < max_retries - 1:
+                wait_time = (2 ** attempt) * 2
+                print(f"  ⚠️  Evaluator API overloaded (attempt {attempt + 1}/{max_retries}). Retrying in {wait_time}s...")
+                await asyncio.sleep(wait_time)
+            else:
+                print(f"  ✗ Evaluator failed: {error_str}")
+                return f"Unable to generate executive summary due to API error."
+
+    return "Executive summary generation failed after maximum retries."
+
+
 async def analyze_competitor(competitor: dict, months_ago: int = 6) -> dict:
     """
     Run full analysis on a single competitor.
@@ -185,9 +345,12 @@ async def analyze_competitor(competitor: dict, months_ago: int = 6) -> dict:
         print(f"\n👻 Running Ghost Probe on {ats_url}...")
         try:
             jobs = fetch_jobs(ats_url, ats_type)
-            print(f"  Found {len(jobs)} open positions")
 
-            if jobs:
+            if not jobs:
+                print(f"  ⚠ No jobs found (ATS may be invalid or empty)")
+            else:
+                print(f"  Found {len(jobs)} open positions")
+
                 # Analyze current jobs
                 result['hiring_analysis'] = analyze_jobs_with_ai(jobs, name)
 
@@ -206,6 +369,16 @@ async def analyze_competitor(competitor: dict, months_ago: int = 6) -> dict:
             print(f"  ✗ Job analysis failed: {e}")
     else:
         print(f"\n👻 Skipping job analysis (no ATS detected)")
+
+    # --- 3. Executive Summary (Evaluator Agent) ---
+    print(f"\n🎯 Running Evaluator Agent...")
+    try:
+        executive_summary = await generate_executive_summary(result)
+        result['executive_summary'] = executive_summary
+        print(f"  ✓ Executive summary generated ({len(executive_summary.split())} words)")
+    except Exception as e:
+        print(f"  ✗ Evaluator failed: {e}")
+        result['executive_summary'] = "Executive summary unavailable."
 
     return result
 
@@ -230,19 +403,69 @@ async def run_pipeline(description: str = None, competitor_names: list[str] = No
 
     # --- Step 1: Discovery ---
     if competitor_names:
-        # Manual competitor list provided
+        # Manual competitor list provided - need to look up domains
         print(f"\n🎯 Using provided competitors: {competitor_names}")
+        print("🧠 Looking up domains...")
+
+        # Use Gemini to get domains for the provided names
+
+        api_key = os.getenv("GEMINI_API_KEY")
+        if api_key:
+            client = genai.Client(api_key=api_key)
+            model_id = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+
+            prompt = f"""For each company name, provide their main website domain.
+Return a JSON array of objects with "name" and "domain" fields.
+Companies: {', '.join(competitor_names)}
+Example: [{{"name": "Asana", "domain": "asana.com"}}]"""
+
+            config = types.GenerateContentConfig(
+                response_mime_type="application/json"
+            )
+
+            # Retry with exponential backoff
+            retryable_errors = ['429', '503', 'RESOURCE_EXHAUSTED', 'UNAVAILABLE', 'overloaded']
+            max_retries = 5
+            comp_data = None
+
+            for attempt in range(max_retries):
+                try:
+                    response = client.models.generate_content(
+                        model=model_id, contents=prompt, config=config
+                    )
+                    comp_data = json.loads(response.text.strip())
+                    break
+                except Exception as e:
+                    error_str = str(e)
+                    is_retryable = any(code in error_str for code in retryable_errors)
+
+                    if is_retryable and attempt < max_retries - 1:
+                        wait_time = (2 ** attempt) * 2
+                        print(f"  ⚠️  API overloaded (attempt {attempt + 1}/{max_retries}). Retrying in {wait_time}s...")
+                        time.sleep(wait_time)
+                    else:
+                        print(f"Failed to look up domains: {e}")
+                        comp_data = [{'name': n, 'domain': None} for n in competitor_names]
+                        break
+
+            if comp_data is None:
+                comp_data = [{'name': n, 'domain': None} for n in competitor_names]
+        else:
+            comp_data = [{'name': n, 'domain': None} for n in competitor_names]
+
+        # Now run discovery for each
         competitors = []
-        for name in competitor_names:
-            # Minimal discovery for each
-            comp = {'name': name, 'domain': None}
+        for comp in comp_data:
+            if not comp.get('domain'):
+                print(f"  ⚠ No domain for {comp.get('name')}, skipping")
+                continue
             links = find_company_links(comp)
             if links:
                 # Try to find ATS
                 if links.get('careers_url'):
                     ats = detect_ats(links['careers_url'])
                     if not ats:
-                        ats = try_common_ats_urls(name)
+                        ats = try_common_ats_urls(links['name'])
                     if ats:
                         links['ats_url'] = ats['url']
                         links['ats_type'] = ats['type']
@@ -301,22 +524,43 @@ def print_summary(results: list[dict]):
         name = r.get('name', 'Unknown')
         print(f"\n[{name}]")
 
-        # Pricing summary
-        pricing = r.get('pricing_analysis', {})
-        if pricing and 'analysis' in pricing:
-            analysis = pricing.get('analysis', {})
-            strategic = analysis.get('strategic_analysis') or analysis.get('summary_of_changes', 'N/A')
-            print(f"  💰 Pricing: {strategic[:100]}...")
+        # Executive summary from evaluator
+        exec_summary = r.get('executive_summary', '')
+        if exec_summary and exec_summary != "Executive summary unavailable.":
+            # Show first 300 chars of executive summary
+            if len(exec_summary) > 300:
+                exec_summary = exec_summary[:300] + "..."
+            print(f"  📋 {exec_summary}")
+        else:
+            # Fallback to individual summaries
+            # Pricing summary
+            pricing = r.get('pricing_analysis', {})
+            if pricing and isinstance(pricing, dict):
+                analysis = pricing.get('analysis', {})
+                if isinstance(analysis, dict):
+                    strategic = (
+                        analysis.get('strategic_shift') or
+                        analysis.get('strategic_analysis') or
+                        analysis.get('summary')
+                    )
+                    if strategic and strategic != 'N/A':
+                        if len(strategic) > 150:
+                            strategic = strategic[:150] + "..."
+                        print(f"  💰 Pricing: {strategic}")
 
-        # Hiring summary
-        hiring = r.get('hiring_analysis', {})
-        if hiring:
-            print(f"  👥 Hiring: {hiring.get('summary', 'N/A')}")
+            # Hiring summary
+            hiring = r.get('hiring_analysis', {})
+            if hiring and isinstance(hiring, dict):
+                summary = hiring.get('summary')
+                if summary:
+                    print(f"  👥 Hiring: {summary}")
 
-        # Trends
-        trends = r.get('hiring_trends', {})
-        if trends:
-            print(f"  📈 Trend: {trends.get('summary', 'N/A')}")
+            # Trends
+            trends = r.get('hiring_trends', {})
+            if trends and isinstance(trends, dict):
+                trend_summary = trends.get('summary')
+                if trend_summary:
+                    print(f"  📈 Trend: {trend_summary}")
 
 
 def main():

@@ -11,51 +11,120 @@ import re
 from ghost_probe import detect_ats
 
 
+def _verify_ashby_exists(slug: str) -> bool:
+    """Check if an Ashby job board actually exists and has jobs."""
+    api_url = 'https://jobs.ashbyhq.com/api/non-user-graphql?op=ApiJobBoardWithTeams'
+    payload = {
+        "operationName": "ApiJobBoardWithTeams",
+        "variables": {"organizationHostedJobsPageName": slug},
+        "query": """query ApiJobBoardWithTeams($organizationHostedJobsPageName: String!) {
+            jobBoard: jobBoardWithTeams(organizationHostedJobsPageName: $organizationHostedJobsPageName) {
+                jobPostings { id }
+            }
+        }"""
+    }
+    try:
+        resp = requests.post(api_url, json=payload, timeout=10)
+        data = resp.json()
+        job_board = data.get('data', {}).get('jobBoard')
+        if job_board and job_board.get('jobPostings'):
+            return len(job_board['jobPostings']) > 0
+    except Exception:
+        pass
+    return False
+
+
+def _verify_greenhouse_exists(slug: str) -> bool:
+    """Check if a Greenhouse job board actually exists and has real job listings."""
+    urls = [
+        f"https://job-boards.greenhouse.io/{slug}",
+        f"https://boards.greenhouse.io/{slug}"
+    ]
+    for url in urls:
+        try:
+            resp = requests.get(url, timeout=10, headers={'User-Agent': 'Sentinel/1.0'}, allow_redirects=True)
+            if resp.status_code != 200:
+                continue
+
+            # Check if we stayed on greenhouse.io (not redirected to company's own careers page)
+            if 'greenhouse.io' not in resp.url:
+                continue
+
+            # Look for actual job posting indicators
+            # Real greenhouse boards have job cards with specific structure
+            text = resp.text.lower()
+            has_jobs_link = '/jobs/' in text
+            has_opening = 'opening' in text or 'position' in text
+            has_apply = 'apply' in text
+
+            # Must have job links AND (opening/position OR apply button)
+            if has_jobs_link and (has_opening or has_apply):
+                # Additional check: count job links - should be more than just navigation
+                job_link_count = text.count('/jobs/')
+                if job_link_count >= 3:  # At least 3 job links suggests real listings
+                    return True
+        except Exception:
+            pass
+    return False
+
+
+def _verify_lever_exists(slug: str) -> bool:
+    """Check if a Lever job board actually exists."""
+    url = f"https://jobs.lever.co/{slug}"
+    try:
+        resp = requests.get(url, timeout=10, headers={'User-Agent': 'Sentinel/1.0'})
+        # Lever returns 404 for invalid boards
+        if resp.status_code == 200 and 'posting' in resp.text.lower():
+            return True
+    except Exception:
+        pass
+    return False
+
+
 def try_common_ats_urls(company_name: str) -> dict | None:
     """
     Fallback: directly check if common ATS URLs exist for a company.
-    Many companies have predictable ATS URLs even if not linked from careers page.
+    Validates that the ATS actually has job listings (not just 200 status).
     """
     # Normalize company name for URL (lowercase, remove spaces/punctuation)
     slug = company_name.lower().replace(" ", "").replace(".", "").replace("-", "")
     slug_hyphen = company_name.lower().replace(" ", "-").replace(".", "")
 
-    ats_patterns = [
-        ("greenhouse", f"https://boards.greenhouse.io/{slug}"),
-        ("greenhouse", f"https://boards.greenhouse.io/{slug_hyphen}"),
-        ("lever", f"https://jobs.lever.co/{slug}"),
-        ("lever", f"https://jobs.lever.co/{slug_hyphen}"),
-        ("ashby", f"https://jobs.ashbyhq.com/{slug}"),
-        ("ashby", f"https://jobs.ashbyhq.com/{slug_hyphen}"),
-        ("ashby", f"https://jobs.ashbyhq.com/{company_name}"),
-    ]
+    # Try Greenhouse first (most common)
+    for s in [slug, slug_hyphen]:
+        if _verify_greenhouse_exists(s):
+            return {"type": "greenhouse", "url": f"https://job-boards.greenhouse.io/{s}"}
 
-    headers = {'User-Agent': 'Sentinel/1.0'}
+    # Try Lever
+    for s in [slug, slug_hyphen]:
+        if _verify_lever_exists(s):
+            return {"type": "lever", "url": f"https://jobs.lever.co/{s}"}
 
-    for ats_type, url in ats_patterns:
-        try:
-            resp = requests.head(url, headers=headers, timeout=5, allow_redirects=True)
-            if resp.status_code == 200:
-                return {"type": ats_type, "url": url}
-        except requests.RequestException:
-            continue
+    # Try Ashby (verify via API)
+    for s in [slug, slug_hyphen, company_name]:
+        if _verify_ashby_exists(s):
+            return {"type": "ashby", "url": f"https://jobs.ashbyhq.com/{s}"}
 
     return None
 
 load_dotenv()
 
 
-def suggest_competitors(user_description: str, num_competitors: int = 5) -> list[dict]:
+def suggest_competitors(user_description: str, num_competitors: int = 5, max_retries: int = 5) -> list[dict]:
     """
     Uses Gemini to suggest competitors based on a product/company description.
+    Includes exponential backoff retry for transient API errors.
 
     Args:
         user_description: Description of the product/company to find competitors for
         num_competitors: Number of competitors to return (default 5)
+        max_retries: Maximum retry attempts for transient errors
 
     Returns:
         List of dicts with 'name' and 'domain' keys
     """
+    import time
+
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise ValueError(
@@ -76,40 +145,56 @@ Example output: [{"name": "Asana", "domain": "asana.com"}, {"name": "Linear", "d
 
 Return a JSON array with name and domain for each competitor."""
 
-    try:
-        config = types.GenerateContentConfig(
-            system_instruction=system_instruction,
-            response_mime_type="application/json"
-        )
+    config = types.GenerateContentConfig(
+        system_instruction=system_instruction,
+        response_mime_type="application/json"
+    )
 
-        response = client.models.generate_content(
-            model=model_id,
-            contents=user_prompt,
-            config=config
-        )
+    # Transient error indicators
+    retryable_errors = ['429', '503', 'RESOURCE_EXHAUSTED', 'UNAVAILABLE', 'overloaded']
 
-        # Parse the JSON response
-        result_text = response.text.strip()
-        # Clean markdown code blocks if present
-        if result_text.startswith("```"):
-            result_text = result_text.split("\n", 1)[1]
-            result_text = result_text.rsplit("```", 1)[0]
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model=model_id,
+                contents=user_prompt,
+                config=config
+            )
 
-        competitors = json.loads(result_text)
+            # Parse the JSON response
+            result_text = response.text.strip()
+            # Clean markdown code blocks if present
+            if result_text.startswith("```"):
+                result_text = result_text.split("\n", 1)[1]
+                result_text = result_text.rsplit("```", 1)[0]
 
-        if isinstance(competitors, list):
-            return competitors[:num_competitors]
-        else:
-            print(f"Unexpected response format: {result_text}")
+            competitors = json.loads(result_text)
+
+            if isinstance(competitors, list):
+                return competitors[:num_competitors]
+            else:
+                print(f"Unexpected response format: {result_text}")
+                return []
+
+        except json.JSONDecodeError as e:
+            print(f"Failed to parse Gemini response as JSON: {e}")
+            print(f"Raw response: {response.text[:500]}")
             return []
 
-    except json.JSONDecodeError as e:
-        print(f"Failed to parse Gemini response as JSON: {e}")
-        print(f"Raw response: {response.text[:500]}")
-        return []
-    except Exception as e:
-        print(f"Gemini API error: {e}")
-        return []
+        except Exception as e:
+            error_str = str(e)
+            is_retryable = any(code in error_str for code in retryable_errors)
+
+            if is_retryable and attempt < max_retries - 1:
+                wait_time = (2 ** attempt) * 2  # 2s, 4s, 8s, 16s, 32s
+                print(f"⚠️  API overloaded (attempt {attempt + 1}/{max_retries}). Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                print(f"Gemini API error: {e}")
+                return []
+
+    print("Max retries exceeded for suggest_competitors")
+    return []
 
 # 2. The Hands: Find the URLs
 
@@ -174,7 +259,7 @@ def find_company_links(competitor: dict) -> dict:
         print(f"  ? Pricing (unverified): {data['pricing_url']}")
 
     # Try common careers page paths
-    careers_paths = ["/careers", "/jobs", "/about/careers", "/company/careers"]
+    careers_paths = ["/jobs/all", "/careers", "/jobs", "/about/careers", "/company/careers"]
     for path in careers_paths:
         careers_url = f"{domain.rstrip('/')}{path}"
         if verify_url(careers_url, headers):

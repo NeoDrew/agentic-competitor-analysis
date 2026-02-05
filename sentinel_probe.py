@@ -50,7 +50,7 @@ def _save_output_to_file(data: dict, url: str):
         print(f"⚠️  Warning: Failed to save output file: {e}")
         return None
 
-# --- Helper: Save Prompt to File (Restored) ---
+# --- Helper: Save Prompt to File ---
 def _save_prompt_to_file(label: str, content: str):
     """
     Saves the full prompt context to a file for debugging.
@@ -103,12 +103,19 @@ def _clean_json_text(text: str) -> str:
     return text.strip()
 
 # --- Helper: Auto-Retry & Config Manager ---
-async def _call_gemini_with_retry(client, model_id, contents, system_instruction, retries=3):
+async def _call_gemini_with_retry(client, model_id, contents, system_instruction, retries=5):
+    """
+    Call Gemini API with exponential backoff retry for transient errors.
+    Handles 429 (rate limit), 503 (overloaded), and other transient errors.
+    """
     is_gemma = "gemma" in model_id.lower()
     config_params = {"system_instruction": system_instruction}
     if not is_gemma:
         config_params["response_mime_type"] = "application/json"
     config = types.GenerateContentConfig(**config_params)
+
+    # Transient error codes that should trigger retry
+    retryable_errors = ['429', '503', 'RESOURCE_EXHAUSTED', 'UNAVAILABLE', 'overloaded']
 
     for attempt in range(retries):
         try:
@@ -124,14 +131,18 @@ async def _call_gemini_with_retry(client, model_id, contents, system_instruction
                 return {"error": "JSON Parse Failed", "raw_text": clean_text[:500]}
         except Exception as e:
             error_str = str(e)
-            if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+            is_retryable = any(code in error_str for code in retryable_errors)
+
+            if is_retryable and attempt < retries - 1:
+                # Exponential backoff: 2s, 4s, 8s, 16s, 32s
                 wait_time = (2 ** attempt) * 2
-                print(f"⚠️  Quota limit hit. Retrying in {wait_time}s...")
+                print(f"⚠️  API overloaded (attempt {attempt + 1}/{retries}). Retrying in {wait_time}s...")
                 await asyncio.sleep(wait_time)
             else:
                 print(f"❌ API Error: {error_str}")
                 return {"error": error_str}
-    return {"error": "Max retries exceeded."}
+
+    return {"error": "Max retries exceeded after backoff."}
 
 # --- NEW: Smart HTML Cleaner ---
 def _clean_html(html_content: str) -> str:
@@ -171,7 +182,7 @@ async def _analyze_single_state(client, model_id, markdown_text, label, prompt_f
 
     # LOGGING RESTORED: Save the inputs to a file
     log_content = f"SYSTEM_INSTRUCTION:\n{system_instruction}\n\nUSER_PAYLOAD:\n{user_payload}"
-    _save_prompt_to_file(f"state_{label}", log_content)
+    # _save_prompt_to_file(f"state_{label}", log_content)
 
     return await _call_gemini_with_retry(client, model_id, user_payload, system_instruction)
 
@@ -194,7 +205,7 @@ async def _synthesize_diff(client, model_id, old_state, new_state, prompt_file):
     
     # LOGGING RESTORED
     log_content = f"SYSTEM_INSTRUCTION:\n{system_instruction}\n\nUSER_PAYLOAD:\n{user_payload}"
-    _save_prompt_to_file("diff", log_content)
+    # _save_prompt_to_file("diff", log_content)
 
     return await _call_gemini_with_retry(client, model_id, user_payload, system_instruction)
 
@@ -287,6 +298,6 @@ async def analyze_diff(old_md: str | None, new_md: str | None,
     }
 
     # --- SAVE OUTPUT ---
-    _save_output_to_file(final_result, target_url)
+    # _save_output_to_file(final_result, target_url)
 
     return final_result

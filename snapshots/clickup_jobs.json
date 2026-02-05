@@ -1,0 +1,428 @@
+{
+  "company": "ClickUp",
+  "ats_url": "https://jobs.ashbyhq.com/clickup",
+  "timestamp": "2026-02-05T18:01:18.830706",
+  "job_count": 84,
+  "jobs": [
+    {
+      "title": "Analytics Engineer",
+      "location": "India",
+      "department": "Customer Experience"
+    },
+    {
+      "title": "Business Development Representative",
+      "location": "United States - San Diego Office",
+      "department": "Business Dev Rep"
+    },
+    {
+      "title": "Business Development Representative",
+      "location": "United States - Dallas Office ",
+      "department": "Business Dev Rep"
+    },
+    {
+      "title": "Business Development Representative (EMEA)",
+      "location": "Ireland - Dublin Office",
+      "department": "Sales Development Rep"
+    },
+    {
+      "title": "Customer Success Manager",
+      "location": "Philippines",
+      "department": "Dedicated Customer Success"
+    },
+    {
+      "title": "Demand Operator, Lead",
+      "location": "India",
+      "department": "Demand Generation"
+    },
+    {
+      "title": "Director, Lifecycle Marketing",
+      "location": "United States of America",
+      "department": "Lifecycle Marketing"
+    },
+    {
+      "title": "Engineering Manager",
+      "location": "United States of America",
+      "department": "Front End Engineering"
+    },
+    {
+      "title": "Enterprise Account Executive (AMER) ",
+      "location": "United States of America",
+      "department": "Enterprise Sales"
+    },
+    {
+      "title": "Executive Assistant",
+      "location": "Philippines",
+      "department": "Marketing HQ"
+    },
+    {
+      "title": "Executive Assistant ",
+      "location": "Philippines",
+      "department": "Engineering HQ"
+    },
+    {
+      "title": "Fixed Term Senior Talent Acquisition Partner",
+      "location": "Czechia",
+      "department": "Recruiting"
+    },
+    {
+      "title": "Group Product Manager",
+      "location": "United States of America",
+      "department": "Product HQ"
+    },
+    {
+      "title": "GTM Data Analyst ",
+      "location": "India",
+      "department": "Revenue Data Systems"
+    },
+    {
+      "title": "Implementation Specialist, Professional Services",
+      "location": "Philippines",
+      "department": "Professional Services"
+    },
+    {
+      "title": "Manager, Customer Success",
+      "location": "Philippines",
+      "department": "Dedicated Customer Success"
+    },
+    {
+      "title": "Manager, Professional Services",
+      "location": "United States of America",
+      "department": "Professional Services"
+    },
+    {
+      "title": "Manager, Sales Development",
+      "location": "Ireland - Dublin Office",
+      "department": "Digital Sales"
+    },
+    {
+      "title": "Manager, Software Engineering",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Market Development Representative",
+      "location": "Philippines",
+      "department": "Sales Development Rep"
+    },
+    {
+      "title": "Mid-Market Account Executive",
+      "location": "United States of America",
+      "department": "Mid-Market Sales"
+    },
+    {
+      "title": "Principal Backend Engineer, Collaboration Platforms",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Principal Frontend Engineer",
+      "location": "United States of America",
+      "department": "Front End Engineering"
+    },
+    {
+      "title": "Product Manager, Billing & Payments",
+      "location": "United States of America",
+      "department": "Growth Product"
+    },
+    {
+      "title": "Product Specialist, Professional Services",
+      "location": "Philippines",
+      "department": "Professional Services"
+    },
+    {
+      "title": "Regional Director, Enterprise Sales (AMER)- Boston ",
+      "location": "United States of America",
+      "department": "Enterprise Sales"
+    },
+    {
+      "title": "Regional Director, Mid-Market",
+      "location": "United Kingdom",
+      "department": "SMB Sales"
+    },
+    {
+      "title": "Regional VP Enteprise Sales- EMEA",
+      "location": "Ireland - Dublin Office",
+      "department": "Enterprise Mgrs"
+    },
+    {
+      "title": "Release Engineering Manager",
+      "location": "United States of America",
+      "department": "Engineering HQ"
+    },
+    {
+      "title": "Renewal Specialist (APAC)",
+      "location": "Philippines",
+      "department": "Customer Operations"
+    },
+    {
+      "title": "Sales Development Representative",
+      "location": "United States - Dallas Office ",
+      "department": "Sales Development Rep"
+    },
+    {
+      "title": "Sales Development Representative",
+      "location": "United States - San Diego Office",
+      "department": "Sales Development Rep"
+    },
+    {
+      "title": "Sales Development Representative (EMEA)",
+      "location": "Ireland - Dublin Office",
+      "department": "Sales Development Rep"
+    },
+    {
+      "title": "Senior AI Engineer - AI Platform",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior AI Engineer - AI Product ",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior AI Engineer - Multi-Agent Frameworks",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior Backend Engineer, Chat & Notifications",
+      "location": "Czechia",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior Backend Engineer, Fields",
+      "location": "Czechia",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior Backend Engineer, Meetings",
+      "location": "Ireland",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior Backend Engineer, Tasks",
+      "location": "Hungary",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior Backend Engineer, Work Analytics",
+      "location": "Czechia",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior Customer Success Manager (CSM) (AMER)",
+      "location": "United States of America",
+      "department": "Dedicated Customer Success"
+    },
+    {
+      "title": "Senior Database Reliability Engineer",
+      "location": "Poland",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior Data Engineer",
+      "location": "India",
+      "department": "Revenue Data Systems"
+    },
+    {
+      "title": "Senior Digital Adoption Specialist",
+      "location": "Philippines",
+      "department": "Digital Adoption"
+    },
+    {
+      "title": "Senior Director of Engineering",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior Frontend Engineer",
+      "location": "Poland",
+      "department": "Front End Engineering"
+    },
+    {
+      "title": "Senior Frontend Engineer",
+      "location": "United States of America",
+      "department": "Front End Engineering"
+    },
+    {
+      "title": "Senior Frontend Engineer, Chat",
+      "location": "Poland",
+      "department": "Front End Engineering"
+    },
+    {
+      "title": "Senior Frontend Engineer, Docs",
+      "location": "United States of America",
+      "department": "Front End Engineering"
+    },
+    {
+      "title": "Senior Graphic Designer",
+      "location": "United States of America",
+      "department": "Brand"
+    },
+    {
+      "title": "Senior GTM Data Analyst",
+      "location": "India",
+      "department": "Revenue Data Systems"
+    },
+    {
+      "title": "Senior Infrastructure Engineer, Cloud Platform",
+      "location": "Poland",
+      "department": "DevOps Engineering"
+    },
+    {
+      "title": "Senior Manager, Business Systems - GTM & AI Automation",
+      "location": "United States of America",
+      "department": "IT & Security"
+    },
+    {
+      "title": " Senior Manager, Customer Support ",
+      "location": "Philippines",
+      "department": "Customer Support"
+    },
+    {
+      "title": "Senior Mobile Engineer",
+      "location": "United Kingdom",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior Mobile Engineer",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Senior Performance Engineer",
+      "location": "United States of America",
+      "department": "Front End Engineering"
+    },
+    {
+      "title": "Senior Product Designer",
+      "location": "United States of America",
+      "department": "Product Design"
+    },
+    {
+      "title": "Senior Product Manager, AI Integrations",
+      "location": "Canada",
+      "department": "Product HQ"
+    },
+    {
+      "title": "Senior Quality Engineer",
+      "location": "United States of America",
+      "department": "Quality Assurance"
+    },
+    {
+      "title": "Senior Security Engineer, App Security ",
+      "location": "United States of America",
+      "department": "Engineering"
+    },
+    {
+      "title": "Senior SEO Manager (AI Search/AEO)",
+      "location": "India",
+      "department": "SEO"
+    },
+    {
+      "title": "Senior Solutions Engineer  ",
+      "location": "United Kingdom",
+      "department": "Solutions"
+    },
+    {
+      "title": "Senior Solutions Engineer (Arabic Fluency) ",
+      "location": "United Kingdom",
+      "department": "Solutions"
+    },
+    {
+      "title": " Senior Solutions Engineer, Enterprise ",
+      "location": "United States of America",
+      "department": "Solutions"
+    },
+    {
+      "title": "Senior Strategic Services Consultant (AMER)",
+      "location": "United States of America",
+      "department": "Professional Services"
+    },
+    {
+      "title": "Senior Strategic Services Consultant, APAC",
+      "location": "Australia",
+      "department": "Professional Services"
+    },
+    {
+      "title": "Senior Strategic Services Consultant (EMEA)",
+      "location": "Ireland",
+      "department": "Professional Services"
+    },
+    {
+      "title": "Senior UI Design Engineer",
+      "location": "United States of America",
+      "department": "Front End Engineering"
+    },
+    {
+      "title": "Software Engineer, Core Services",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Staff AI Engineer - AI Platform",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Staff AI Engineer - AI Product",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Staff AI Engineer - Multi-Agent Frameworks",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Staff Backend Engineer, Docs",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Staff Backend Engineer, Hierarchy",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Staff Backend Engineer, Search",
+      "location": "United States of America",
+      "department": "Backend Engineering"
+    },
+    {
+      "title": "Staff Product Manager, AI",
+      "location": "United States of America",
+      "department": "Product HQ"
+    },
+    {
+      "title": "Staff Quality Engineer",
+      "location": "United States of America",
+      "department": "Quality Assurance"
+    },
+    {
+      "title": "Staff Software Engineer, Test Infrastructure",
+      "location": "United States of America",
+      "department": "Quality Assurance"
+    },
+    {
+      "title": "Staff Solutions Consultant",
+      "location": "United States of America",
+      "department": "Solutions"
+    },
+    {
+      "title": "Support Services Specialist",
+      "location": "Philippines",
+      "department": "Support Services"
+    },
+    {
+      "title": "Technical Support Specialist",
+      "location": "Philippines",
+      "department": "Technical Support"
+    },
+    {
+      "title": "Total Rewards Specialist",
+      "location": "Philippines",
+      "department": "People HQ"
+    }
+  ]
+}
