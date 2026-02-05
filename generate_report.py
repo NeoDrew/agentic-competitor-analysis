@@ -14,20 +14,20 @@ import re
 from datetime import datetime
 import requests
 
-# --- LaTeX Template (Simplified & Robust) ---
+# --- LaTeX Template (Universal Fonts) ---
 LATEX_TEMPLATE = r"""
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}      % Critical for Mac BasicTeX
+\usepackage{lmodern}          % Universal Vector Font (Guaranteed to exist)
 \usepackage[margin=1in]{geometry}
-\usepackage{helvet}
 \usepackage{xcolor}
 \usepackage{longtable}
 \usepackage{booktabs}
 \usepackage{array}
-% Hyperref removed to prevent 'nullfont' warnings
-% Enumitem removed to prevent missing package errors
+\usepackage{textcomp}         % For currency symbols like $
 
-\renewcommand{\familydefault}{\sfdefault}
+% Define Colors
 \definecolor{navy}{RGB}{10, 25, 60}
 \definecolor{sentinelred}{RGB}{200, 30, 30}
 \definecolor{grey}{RGB}{100, 100, 100}
@@ -64,23 +64,20 @@ LATEX_TEMPLATE = r"""
 
 % --- Comparison Table ---
 \renewcommand{\arraystretch}{1.5}
-% Raggedright prevents ugly text stretching in columns
-\begin{longtable}{>{\raggedright\arraybackslash}p{0.48\textwidth} | >{\raggedright\arraybackslash}p{0.48\textwidth}}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.46\textwidth}|>{\raggedright\arraybackslash}p{0.46\textwidth}@{}}
     \textbf{\large 6 Months Ago (Historical)} & \textbf{\large Today (Current)} \\
     \hline
-    \vspace{0.1cm} & \vspace{0.1cm} \\
-    
+    & \\[-0.5em]
+
     \sectionheader{TAGLINE} & \sectionheader{TAGLINE} \\
-    <<OLD_TAGLINE>> & <<NEW_TAGLINE>> \\
-    \vspace{0.3cm} & \vspace{0.3cm} \\
-    
+    <<OLD_TAGLINE>> & <<NEW_TAGLINE>> \\[0.5em]
+
     \sectionheader{AUDIENCE} & \sectionheader{AUDIENCE} \\
-    <<OLD_AUDIENCE>> & <<NEW_AUDIENCE>> \\
-    \vspace{0.3cm} & \vspace{0.3cm} \\
-    
+    <<OLD_AUDIENCE>> & <<NEW_AUDIENCE>> \\[0.5em]
+
     \sectionheader{PRICING} & \sectionheader{PRICING} \\
     <<OLD_PRICING>> & <<NEW_PRICING>> \\
-    
+
 \end{longtable}
 
 \vfill
@@ -91,14 +88,14 @@ LATEX_TEMPLATE = r"""
 \end{document}
 """
 
+
 def escape_latex(text: str) -> str:
     """
     Strictly escapes special characters for LaTeX.
-    Handles newlines by converting them to LaTeX line breaks.
     """
     if not text:
         return ""
-    
+
     # 1. Backslash first (Critical)
     text = text.replace('\\', r'\textbackslash{}')
 
@@ -114,17 +111,18 @@ def escape_latex(text: str) -> str:
         '~': r'\textasciitilde{}',
         '^': r'\textasciicircum{}',
     }
-    
+
     for key, val in replacements.items():
         text = text.replace(key, val)
-    
-    # 3. Handle Newlines (Preserve paragraph structure in table)
-    # Double newline -> Paragraph break
-    text = text.replace('\n\n', r' \par\vspace{0.2cm} ')
-    # Single newline -> Line break
+
+    # 3. Handle Newlines
+    # Convert double newlines to paragraph spacing
+    text = text.replace('\n\n', r' \par\vspace{0.1cm} ')
+    # Convert single newlines to line breaks
     text = text.replace('\n', r' \newline ')
-        
+
     return text
+
 
 def format_markdown(text: str) -> str:
     """
@@ -132,8 +130,8 @@ def format_markdown(text: str) -> str:
     """
     if not text:
         return ""
-    # Safe regex that won't break on escaped chars
     return re.sub(r'\*\*(.*?)\*\*', r'\\textbf{\1}', text)
+
 
 def pretty_domain(url: str) -> str:
     try:
@@ -142,45 +140,43 @@ def pretty_domain(url: str) -> str:
     except Exception:
         return url
 
+
 def format_pricing_latex(plans):
     """
-    Generates a CLEAN LaTeX itemize block for pricing without dependencies.
+    Formats pricing tiers with bold headers and indented descriptions.
     """
     if not plans:
         return "No pricing data available."
-    
-    # Start standard LaTeX list with manual spacing hacks
-    latex_lines = [r'\begin{itemize}', r'\setlength\itemsep{0em}', r'\setlength\parskip{0em}']
-    
+
+    latex_lines = []
+
     # Handle list of objects (New Schema)
     if isinstance(plans, list) and len(plans) > 0 and isinstance(plans[0], dict):
         for p in plans:
             name = escape_latex(p.get("name", "Plan"))
             price = escape_latex(p.get("price", "N/A"))
             mechanic = escape_latex(p.get("usage_mechanic", ""))
-            
-            # Item Header
-            item_str = f"\\item \\textbf{{{name}}} ({price})"
-            latex_lines.append(item_str)
-            
-            # Item Details (Indented, no bullet)
+
+            # Tier header (bold name with price)
+            latex_lines.append(f"\\textbf{{{name}}} ({price})")
+
+            # Description - use newline and small text (table-cell friendly)
             if mechanic:
-                latex_lines.append(f"\\newline \\footnotesize {mechanic}")
+                latex_lines.append(f"\\newline {{\\footnotesize {mechanic}}}")
+            latex_lines.append(r"\newline")
 
     # Handle list of strings (Old Schema)
     elif isinstance(plans, list):
         for p in plans:
             clean_p = escape_latex(str(p))
-            latex_lines.append(f"\\item {clean_p}")
-    
+            latex_lines.append(f"{clean_p} \\newline ")
+
     # Handle raw string fallback
     elif isinstance(plans, str):
-        latex_lines.append(f"\\item {escape_latex(plans)}")
+        latex_lines.append(escape_latex(plans))
 
-    # Close the list
-    latex_lines.append(r'\end{itemize}')
-    
-    return "\n".join(latex_lines)
+    return " ".join(latex_lines)
+
 
 def generate_tex_file(data, outfile_tex):
     result = data.get("result", {})
@@ -190,25 +186,27 @@ def generate_tex_file(data, outfile_tex):
 
     competitor = escape_latex(pretty_domain(data.get("url", "Unknown")))
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
-    
-    # Verdict keys check
+
+    # Verdict keys
     raw_verdict = analysis.get("strategic_analysis") or \
-                  analysis.get("strategic_shift") or \
-                  analysis.get("summary_of_changes") or \
-                  "Analysis failed to generate output."
+        analysis.get("strategic_shift") or \
+        analysis.get("summary_of_changes") or \
+        "Analysis failed to generate output."
     verdict = format_markdown(escape_latex(raw_verdict))
 
     # Fields
     old_tagline = escape_latex(old_state.get("tagline", "N/A"))
     new_tagline = escape_latex(new_state.get("tagline", "N/A"))
-    
+
     old_audience = escape_latex(old_state.get("target_audience", "N/A"))
     new_audience = escape_latex(new_state.get("target_audience", "N/A"))
-    
+
     # Pricing
-    old_pricing_raw = old_state.get("pricing_plans") or old_state.get("pricing_tiers")
-    new_pricing_raw = new_state.get("pricing_plans") or new_state.get("pricing_tiers")
-    
+    old_pricing_raw = old_state.get(
+        "pricing_plans") or old_state.get("pricing_tiers")
+    new_pricing_raw = new_state.get(
+        "pricing_plans") or new_state.get("pricing_tiers")
+
     old_pricing_latex = format_pricing_latex(old_pricing_raw)
     new_pricing_latex = format_pricing_latex(new_pricing_raw)
 
@@ -216,54 +214,49 @@ def generate_tex_file(data, outfile_tex):
     tex = LATEX_TEMPLATE.replace("<<COMPETITOR>>", competitor)
     tex = tex.replace("<<TIMESTAMP>>", timestamp)
     tex = tex.replace("<<VERDICT>>", verdict)
-    
+
     tex = tex.replace("<<OLD_TAGLINE>>", old_tagline)
     tex = tex.replace("<<NEW_TAGLINE>>", new_tagline)
-    
+
     tex = tex.replace("<<OLD_AUDIENCE>>", old_audience)
     tex = tex.replace("<<NEW_AUDIENCE>>", new_audience)
-    
+
     tex = tex.replace("<<OLD_PRICING>>", old_pricing_latex)
     tex = tex.replace("<<NEW_PRICING>>", new_pricing_latex)
 
     with open(outfile_tex, "w", encoding="utf-8") as f:
         f.write(tex)
-    
+
     return True
 
+
 def compile_pdf(tex_file):
-    """
-    Compiles PDF with fault tolerance.
-    Does NOT raise exception on warnings, only on missing PDF.
-    """
     if not shutil.which("pdflatex"):
         print("\n❌ Error: 'pdflatex' not found.")
         print("To fix: brew install --cask basictex (on Mac)")
         return False
-        
+
     try:
-        # Run pdflatex (run twice for layout)
+        # Run pdflatex
         cmd = ["pdflatex", "-interaction=nonstopmode", tex_file]
-        
-        # Suppress output unless debug needed
-        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) # Capture 2nd run
-        
-        # Check if PDF exists
+
+        # We allow it to 'fail' (return non-zero) because benign font warnings trigger it
+        subprocess.run(cmd, stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
+        subprocess.run(cmd, stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
+
         pdf_file = tex_file.replace(".tex", ".pdf")
         if os.path.exists(pdf_file) and os.path.getsize(pdf_file) > 1000:
             return True
         else:
-            print("\n❌ PDF Generation Failed (File missing or empty).")
-            # Try to print log if possible
-            log_file = tex_file.replace(".tex", ".log")
-            if os.path.exists(log_file):
-                print(f"Check log file: {log_file}")
+            print("\n❌ PDF Generation Failed (Empty or missing).")
             return False
 
     except Exception as e:
         print(f"\n❌ Execution Error: {e}")
         return False
+
 
 def poll_job(api_base: str, job_id: str, timeout: int = 300) -> dict:
     deadline = time.time() + timeout
@@ -279,8 +272,10 @@ def poll_job(api_base: str, job_id: str, timeout: int = 300) -> dict:
         time.sleep(2)
     raise SystemExit("Timed out waiting for job.")
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Generate Sentinel LaTeX Report")
+    parser = argparse.ArgumentParser(
+        description="Generate Sentinel LaTeX Report")
     parser.add_argument("--url", required=True)
     parser.add_argument("--months", type=int, default=6)
     parser.add_argument("--api", default="http://127.0.0.1:8000")
@@ -288,7 +283,8 @@ def main():
 
     print(f"Submitting job for {args.url}...")
     try:
-        resp = requests.post(f"{args.api}/analyze", json={"url": args.url, "months": args.months})
+        resp = requests.post(f"{args.api}/analyze",
+                             json={"url": args.url, "months": args.months})
         job = resp.json()
         job_id = job["job_id"]
         print(f"Job Queued: {job_id}")
@@ -298,27 +294,29 @@ def main():
 
     print("Waiting for analysis...")
     result_data = poll_job(args.api, job_id)
-    
+
     if result_data.get("status") == "failed":
         print(f"Job Failed: {result_data.get('error')}")
         return
-    
+
     safe_name = pretty_domain(args.url).replace(".", "-")
     tex_filename = f"report_{safe_name}.tex"
-    
+
     print(f"Generating LaTeX source: {tex_filename}")
     generate_tex_file(result_data, tex_filename)
-    
+
     print("Compiling PDF...")
     if compile_pdf(tex_filename):
         pdf_filename = tex_filename.replace(".tex", ".pdf")
         print(f"\n✅ Success! Report saved to: {pdf_filename}")
-        # Clean up
         for ext in [".aux", ".log", ".out"]:
-            try: os.remove(tex_filename.replace(".tex", ext))
-            except: pass
+            try:
+                os.remove(tex_filename.replace(".tex", ext))
+            except:
+                pass
     else:
-        print("DEBUG: Keeping .tex file for inspection.")
+        print("DEBUG: Check the .tex file for errors.")
+
 
 if __name__ == "__main__":
     main()

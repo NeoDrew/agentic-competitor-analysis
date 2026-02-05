@@ -28,6 +28,28 @@ except Exception:
 from dotenv import load_dotenv
 load_dotenv()
 
+# --- Helper: Save Output to JSON File (NEW) ---
+def _save_output_to_file(data: dict, url: str):
+    """
+    Saves the final analysis result to a JSON file in 'reports/'.
+    """
+    try:
+        os.makedirs("reports", exist_ok=True)
+        
+        # Create a safe filename from the URL
+        safe_name = urllib.parse.urlparse(url).netloc.replace(".", "-")
+        timestamp = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
+        filename = f"reports/diff_{safe_name}_{timestamp}.json"
+        
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            
+        print(f"✅ Analysis saved to: {filename}")
+        return filename
+    except Exception as e:
+        print(f"⚠️  Warning: Failed to save output file: {e}")
+        return None
+
 # --- Helper: Save Prompt to File (Restored) ---
 def _save_prompt_to_file(label: str, content: str):
     """
@@ -234,14 +256,16 @@ def get_historical_state(url: str, months_ago: int) -> tuple[str | None, str | N
 # --- Main Orchestrator ---
 async def analyze_diff(old_md: str | None, new_md: str | None, 
                        state_prompt_path: str = "prompt_state.yaml", 
-                       diff_prompt_path: str = "prompt_diff.yaml") -> dict:
+                       diff_prompt_path: str = "prompt_diff.yaml",
+                       target_url: str = "unknown") -> dict: # Added target_url arg
     
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         return {"error": "GEMINI_API_KEY not set"}
 
     client = genai.Client(api_key=api_key)
-    model_id = os.getenv("GEMINI_MODEL", "gemma-3-27b-it") 
+    # Use 1.5 Pro (Stable/High Detail) or 2.0 Pro Exp (Newer)
+    model_id = os.getenv("GEMINI_MODEL", "gemini-1.5-pro-latest")
 
     print(f"--- Sentinel: Using Model {model_id} ---")
 
@@ -253,10 +277,16 @@ async def analyze_diff(old_md: str | None, new_md: str | None,
 
     print("--- Sentinel: Synthesizing Diff ---")
     diff_struct = await _synthesize_diff(client, model_id, old_struct, new_struct, diff_prompt_path)
-
-    return {
+    
+    final_result = {
         "timestamp": datetime.datetime.utcnow().isoformat(),
+        "url": target_url,
         "old_state": old_struct,
         "new_state": new_struct,
         "analysis": diff_struct
     }
+
+    # --- SAVE OUTPUT ---
+    _save_output_to_file(final_result, target_url)
+
+    return final_result
