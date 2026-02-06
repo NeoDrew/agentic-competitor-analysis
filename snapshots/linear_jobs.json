@@ -1,8 +1,8 @@
 {
   "company": "Linear",
-  "ats_url": "https://jobs.ashbyhq.com/Linear",
-  "timestamp": "2026-02-05T17:59:52.801564",
-  "job_count": 24,
+  "ats_url": "ashby:https://jobs.ashbyhq.com/Linear",
+  "timestamp": "2026-02-06T14:46:18.598897",
+  "job_count": 20,
   "jobs": [
     {
       "title": "Account Executive, APAC",
@@ -36,11 +36,6 @@
     },
     {
       "title": "Designer (Web & Brand)",
-      "location": "North America",
-      "department": "Magic Team"
-    },
-    {
-      "title": "Designer (Web & Brand)",
       "location": "Europe",
       "department": "Magic Team"
     },
@@ -60,11 +55,6 @@
       "department": "Product Management"
     },
     {
-      "title": "Product Manager",
-      "location": "North America",
-      "department": "Product Management"
-    },
-    {
       "title": "Product Support Specialist",
       "location": "West Coast North America",
       "department": "Product Support"
@@ -73,6 +63,11 @@
       "title": "Product Support Specialist (APAC)",
       "location": "Australia",
       "department": "Product Support"
+    },
+    {
+      "title": "Programs & Growth Marketing Lead",
+      "location": "Europe",
+      "department": "Marketing"
     },
     {
       "title": "Revenue Operations (AI & Automation)",
@@ -86,22 +81,12 @@
     },
     {
       "title": "Senior / Staff Fullstack Engineer",
-      "location": "North America",
-      "department": "Engineering"
-    },
-    {
-      "title": "Senior / Staff Fullstack Engineer",
       "location": "Europe",
       "department": "Engineering"
     },
     {
       "title": "Senior / Staff Product Engineer",
       "location": "North America",
-      "department": "Engineering"
-    },
-    {
-      "title": "Senior / Staff Product Engineer",
-      "location": "Europe",
       "department": "Engineering"
     },
     {
@@ -113,11 +98,6 @@
       "title": "Solutions Engineer",
       "location": "North America",
       "department": "Sales"
-    },
-    {
-      "title": "Writer",
-      "location": "North America",
-      "department": "Marketing"
     },
     {
       "title": "Writer",

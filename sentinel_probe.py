@@ -148,20 +148,39 @@ async def _call_gemini_with_retry(client, model_id, contents, system_instruction
 def _clean_html(html_content: str) -> str:
     if not html_content:
         return ""
-    
+
     soup = BeautifulSoup(html_content, "html.parser")
-    
+
     # Kill Scripts, Styles, etc.
-    for tag in soup(["script", "style", "noscript", "iframe", "svg"]):
+    for tag in soup(["script", "style", "noscript", "iframe"]):
         tag.decompose()
 
     # Kill Comments
     for comment in soup.find_all(string=lambda text: isinstance(text, Comment)):
         comment.extract()
 
-    # Kill Navigation & Footers
-    for tag in soup(["nav", "footer", "header", "aside"]):
-        tag.decompose()
+    # Try to find main content area first (more targeted extraction)
+    main_content = soup.find("main") or soup.find("article") or soup.find(id="content")
+
+    if main_content:
+        # Only clean navigation within main content
+        for tag in main_content.find_all(["nav"]):
+            tag.decompose()
+        return str(main_content)
+
+    # Fallback: clean whole page but be less aggressive
+    # Only remove top-level nav/footer (direct children of body)
+    body = soup.find("body")
+    if body:
+        for tag in body.find_all(["nav", "footer", "header"], recursive=False):
+            tag.decompose()
+        # Also remove common navigation divs
+        for div in body.find_all("div", recursive=False):
+            div_class = " ".join(div.get("class", []))
+            div_id = div.get("id", "")
+            if any(nav_term in (div_class + div_id).lower() for nav_term in ["nav", "header", "footer", "menu"]):
+                div.decompose()
+        return str(body)
 
     return str(soup)
 
@@ -209,35 +228,85 @@ async def _synthesize_diff(client, model_id, old_state, new_state, prompt_file):
 
     return await _call_gemini_with_retry(client, model_id, user_payload, system_instruction)
 
-# --- Scraping Helpers (Fixed User-Agent) ---
-async def _fetch_with_aiohttp(url: str) -> str:
-    headers = {"User-Agent": "sentinel-probe/1.0"} 
-    if not aiohttp:
-        return requests.get(url, headers=headers).text
-    
-    timeout = aiohttp.ClientTimeout(total=30)
-    async with aiohttp.ClientSession(headers=headers, timeout=timeout) as session:
-        async with session.get(url) as resp:
-            resp.raise_for_status()
-            return await resp.text()
+# --- Scraping Helpers (Improved Headers & Retries) ---
+BROWSER_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+    # Don't request compression - simpler to handle uncompressed responses
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+}
+
+
+async def _fetch_with_aiohttp(url: str, retries: int = 3) -> str:
+    """Fetch URL content with browser-like headers and retry logic."""
+    last_error = None
+
+    for attempt in range(retries):
+        try:
+            if not aiohttp:
+                resp = requests.get(url, headers=BROWSER_HEADERS, timeout=30, allow_redirects=True)
+                resp.raise_for_status()
+                return resp.text
+
+            timeout = aiohttp.ClientTimeout(total=30)
+            async with aiohttp.ClientSession(headers=BROWSER_HEADERS, timeout=timeout) as session:
+                async with session.get(url, allow_redirects=True) as resp:
+                    resp.raise_for_status()
+                    return await resp.text()
+        except Exception as e:
+            last_error = e
+            if attempt < retries - 1:
+                await asyncio.sleep(2 ** attempt)  # Exponential backoff
+
+    raise last_error or Exception("Failed to fetch URL")
+
 
 async def get_current_state(url: str) -> str:
-    html = await _fetch_with_aiohttp(url)
-    clean_html = _clean_html(html)
-    return mdify(clean_html, heading_style="ATX", strip=['img'])
+    """
+    Fetch and convert a URL to markdown for analysis.
+    Includes retry logic and special handling for problematic sites.
+    Falls back to Wayback Machine for JS-heavy pages.
+    """
+    try:
+        html = await _fetch_with_aiohttp(url)
+
+        # Check if we got meaningful content
+        if not html or len(html.strip()) < 500:
+            print(f"    ⚠ Page returned minimal content ({len(html) if html else 0} chars)")
+            return ""
+
+        clean_html = _clean_html(html)
+        markdown = mdify(clean_html, heading_style="ATX", strip=['img'])
+
+        # Validate we got something useful
+        if not markdown or len(markdown.strip()) < 100:
+            # Page might be JS-rendered - try Wayback Machine as fallback
+            print(f"    ⚠ Page appears to be JS-rendered, trying Wayback Machine...")
+            wayback_md, _ = get_historical_state(url, months_ago=0)  # Get most recent snapshot
+            if wayback_md and len(wayback_md.strip()) > 100:
+                print(f"    ✓ Using Wayback Machine snapshot")
+                return wayback_md
+            print(f"    ⚠ Could not get content (JS-rendered page without cached version)")
+            return ""
+
+        return markdown
+    except Exception as e:
+        print(f"    ✗ Failed to fetch {url}: {e}")
+        return ""
 
 def get_historical_state(url: str, months_ago: int) -> tuple[str | None, str | None]:
     timestamp = (datetime.datetime.utcnow() - datetime.timedelta(days=30 * months_ago)).strftime("%Y%m%d")
-    ua = "sentinel-probe/1.0"
-    
+
     # 1. Try Waybackpy
     if waybackpy:
         try:
             from waybackpy import WaybackMachineAvailabilityAPI
-            api = WaybackMachineAvailabilityAPI(url, ua)
+            api = WaybackMachineAvailabilityAPI(url, BROWSER_HEADERS.get("User-Agent"))
             closest = api.near(year=int(timestamp[:4]), month=int(timestamp[4:6]), day=int(timestamp[6:8]))
             if closest and closest.archive_url:
-                r = requests.get(closest.archive_url, headers={"User-Agent": ua}, timeout=30)
+                r = requests.get(closest.archive_url, headers=BROWSER_HEADERS, timeout=30)
                 clean_html = _clean_html(r.text)
                 return mdify(clean_html, heading_style="ATX", strip=['img']), closest.archive_url
         except Exception:
@@ -245,50 +314,72 @@ def get_historical_state(url: str, months_ago: int) -> tuple[str | None, str | N
 
     # 2. Try Raw API
     api_url = (
-        "[https://archive.org/wayback/available?url=](https://archive.org/wayback/available?url=)"
+        "https://archive.org/wayback/available?url="
         + urllib.parse.quote(url, safe="")
         + "&timestamp="
         + timestamp
     )
     try:
-        r = requests.get(api_url, headers={"User-Agent": ua}, timeout=30)
+        r = requests.get(api_url, headers=BROWSER_HEADERS, timeout=30)
         j = r.json()
         snap = j.get("archived_snapshots", {}).get("closest")
         if not snap:
             return None, None
-        
+
         snapshot_url = snap.get("url")
-        r2 = requests.get(snapshot_url, headers={"User-Agent": ua}, timeout=30)
+        r2 = requests.get(snapshot_url, headers=BROWSER_HEADERS, timeout=30)
         clean_html = _clean_html(r2.text)
         return mdify(clean_html, heading_style="ATX", strip=['img']), snapshot_url
     except Exception:
         return None, None
 
 # --- Main Orchestrator ---
-async def analyze_diff(old_md: str | None, new_md: str | None, 
-                       state_prompt_path: str = "prompt_state.yaml", 
+async def analyze_diff(old_md: str | None, new_md: str | None,
+                       state_prompt_path: str = "prompt_state.yaml",
                        diff_prompt_path: str = "prompt_diff.yaml",
-                       target_url: str = "unknown") -> dict: # Added target_url arg
-    
+                       target_url: str = "unknown") -> dict:
+    """
+    Analyze pricing page data. Supports two modes:
+    1. Full diff: When both old_md and new_md are provided
+    2. Current-only: When only new_md is provided (no historical data)
+    """
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         return {"error": "GEMINI_API_KEY not set"}
 
     client = genai.Client(api_key=api_key)
-    # Use 1.5 Pro (Stable/High Detail) or 2.0 Pro Exp (Newer)
     model_id = os.getenv("GEMINI_MODEL", "gemini-1.5-pro-latest")
 
     print(f"--- Sentinel: Using Model {model_id} ---")
 
+    # Handle current-only mode (no historical data)
+    if not old_md and new_md:
+        print("--- Sentinel: Analyzing Current State Only ---")
+        new_struct = await _analyze_single_state(client, model_id, new_md, "current", state_prompt_path)
+
+        final_result = {
+            "timestamp": datetime.datetime.utcnow().isoformat(),
+            "url": target_url,
+            "old_state": None,
+            "new_state": new_struct,
+            "analysis": {
+                "change_detected": False,
+                "strategic_shift": "Current state only - no historical comparison available",
+                "evidence": {}
+            }
+        }
+        return final_result
+
+    # Full diff mode
     print("--- Sentinel: Analyzing States ---")
     task_old = _analyze_single_state(client, model_id, old_md, "historical", state_prompt_path)
     task_new = _analyze_single_state(client, model_id, new_md, "current", state_prompt_path)
-    
+
     old_struct, new_struct = await asyncio.gather(task_old, task_new)
 
     print("--- Sentinel: Synthesizing Diff ---")
     diff_struct = await _synthesize_diff(client, model_id, old_struct, new_struct, diff_prompt_path)
-    
+
     final_result = {
         "timestamp": datetime.datetime.utcnow().isoformat(),
         "url": target_url,
@@ -296,8 +387,5 @@ async def analyze_diff(old_md: str | None, new_md: str | None,
         "new_state": new_struct,
         "analysis": diff_struct
     }
-
-    # --- SAVE OUTPUT ---
-    # _save_output_to_file(final_result, target_url)
 
     return final_result

@@ -1,0 +1,83 @@
+{
+  "company": "Azure DevOps",
+  "ats_url": "levels.fyi/microsoft",
+  "timestamp": "2026-02-06T15:09:53.823113",
+  "job_count": 15,
+  "jobs": [
+    {
+      "title": "Senior Finance Manager - Data Center Deals",
+      "location": "Redmond, WA",
+      "department": "Finance"
+    },
+    {
+      "title": "Solution Engineering",
+      "location": "Bengaluru, Karnataka, India",
+      "department": "Engineering"
+    },
+    {
+      "title": "Digital Solution Area Specialist",
+      "location": "Sydney, New South Wales, Australia",
+      "department": "General"
+    },
+    {
+      "title": "Senior Performance Architect",
+      "location": "Hillsboro, OR",
+      "department": "Engineering"
+    },
+    {
+      "title": "Senior Applied Scientist",
+      "location": "Beijing, Beijing, China",
+      "department": "General"
+    },
+    {
+      "title": "Cloud Solution Architect D365 F&O",
+      "location": "Melbourne, Victoria, Australia",
+      "department": "Engineering"
+    },
+    {
+      "title": "Software Engineer II - Android",
+      "location": "Prague, Prague, Czechia",
+      "department": "Engineering"
+    },
+    {
+      "title": "Principal Software Engineering Manager",
+      "location": "Redmond, WA",
+      "department": "Engineering"
+    },
+    {
+      "title": "Senior Software Engineer",
+      "location": "Hyderabad, Telangana, India",
+      "department": "Engineering"
+    },
+    {
+      "title": "Technical Support Engineering - UEX",
+      "location": "India",
+      "department": "Engineering"
+    },
+    {
+      "title": "Principal Software Engineer",
+      "location": "Santa Clara, CA",
+      "department": "Engineering"
+    },
+    {
+      "title": "Software Engineer II",
+      "location": "Mountain View, CA",
+      "department": "Engineering"
+    },
+    {
+      "title": "HV Substation Engineer",
+      "location": "Singapore, Singapore",
+      "department": "Engineering"
+    },
+    {
+      "title": "Software Engineer",
+      "location": "London, England, United Kingdom",
+      "department": "Engineering"
+    },
+    {
+      "title": "Senior Finance Manager, HR Strategy & Experience",
+      "location": "Redmond, WA",
+      "department": "Finance"
+    }
+  ]
+}

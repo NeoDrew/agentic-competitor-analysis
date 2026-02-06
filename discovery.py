@@ -42,7 +42,8 @@ def _verify_greenhouse_exists(slug: str) -> bool:
     ]
     for url in urls:
         try:
-            resp = requests.get(url, timeout=10, headers={'User-Agent': 'Sentinel/1.0'}, allow_redirects=True)
+            resp = requests.get(url, timeout=10, headers={
+                                'User-Agent': 'Sentinel/1.0'}, allow_redirects=True)
             if resp.status_code != 200:
                 continue
 
@@ -72,13 +73,123 @@ def _verify_lever_exists(slug: str) -> bool:
     """Check if a Lever job board actually exists."""
     url = f"https://jobs.lever.co/{slug}"
     try:
-        resp = requests.get(url, timeout=10, headers={'User-Agent': 'Sentinel/1.0'})
+        resp = requests.get(url, timeout=10, headers={
+                            'User-Agent': 'Sentinel/1.0'})
         # Lever returns 404 for invalid boards
         if resp.status_code == 200 and 'posting' in resp.text.lower():
             return True
     except Exception:
         pass
     return False
+
+
+# Known companies with custom career pages (no standard ATS)
+# Maps product names and company names to their job data sources
+CUSTOM_CAREERS = {
+    # Atlassian products
+    'atlassian': {
+        'careers_url': 'https://www.atlassian.com/company/careers/all-jobs',
+        'levelsfyi_slug': 'atlassian',
+        'pricing_url': 'https://www.atlassian.com/software/jira/pricing',
+    },
+    'jira': {
+        'careers_url': 'https://www.atlassian.com/company/careers/all-jobs',
+        'levelsfyi_slug': 'atlassian',
+        'pricing_url': 'https://www.atlassian.com/software/jira/pricing',
+    },
+    'confluence': {
+        'careers_url': 'https://www.atlassian.com/company/careers/all-jobs',
+        'levelsfyi_slug': 'atlassian',
+        'pricing_url': 'https://www.atlassian.com/software/confluence/pricing',
+    },
+    'trello': {
+        'careers_url': 'https://www.atlassian.com/company/careers/all-jobs',
+        'levelsfyi_slug': 'atlassian',
+        'pricing_url': 'https://trello.com/pricing',
+    },
+    # Microsoft products
+    'microsoft': {
+        'careers_url': 'https://careers.microsoft.com/',
+        'levelsfyi_slug': 'microsoft',
+        'pricing_url': None,
+    },
+    'azure devops': {
+        'careers_url': 'https://careers.microsoft.com/',
+        'levelsfyi_slug': 'microsoft',
+        'pricing_url': 'https://azure.microsoft.com/en-us/pricing/details/devops/azure-devops-services/',
+    },
+    'azure': {
+        'careers_url': 'https://careers.microsoft.com/',
+        'levelsfyi_slug': 'microsoft',
+    },
+    # GitHub (Microsoft subsidiary but separate brand)
+    'github': {
+        'careers_url': 'https://github.com/about/careers',
+        'levelsfyi_slug': 'github',
+        'pricing_url': 'https://github.com/pricing',
+    },
+    'github projects': {
+        'careers_url': 'https://github.com/about/careers',
+        'levelsfyi_slug': 'github',
+        'pricing_url': 'https://github.com/pricing',
+    },
+    # GitLab
+    'gitlab': {
+        'careers_url': 'https://about.gitlab.com/jobs/',
+        'levelsfyi_slug': 'gitlab',
+        'pricing_url': 'https://about.gitlab.com/pricing/',
+    },
+    # Monday.com
+    'monday.com': {
+        'careers_url': 'https://monday.com/careers',
+        'levelsfyi_slug': 'mondaycom',
+        'pricing_url': 'https://monday.com/pricing',
+    },
+    'monday': {
+        'careers_url': 'https://monday.com/careers',
+        'levelsfyi_slug': 'mondaycom',
+        'pricing_url': 'https://monday.com/pricing',
+    },
+    # Other major companies
+    'notion': {
+        'careers_url': 'https://www.notion.so/careers',
+        'levelsfyi_slug': 'notion',
+        'pricing_url': 'https://www.notion.so/pricing',
+    },
+    'figma': {
+        'careers_url': 'https://www.figma.com/careers/',
+        'levelsfyi_slug': 'figma',
+        'pricing_url': 'https://www.figma.com/pricing/',
+    },
+    'stripe': {
+        'careers_url': 'https://stripe.com/jobs',
+        'levelsfyi_slug': 'stripe',
+        'pricing_url': 'https://stripe.com/pricing',
+    },
+    'asana': {
+        'careers_url': 'https://asana.com/jobs',
+        'levelsfyi_slug': 'asana',
+        'pricing_url': 'https://asana.com/pricing',
+    },
+    'clickup': {
+        'careers_url': 'https://clickup.com/careers',
+        'levelsfyi_slug': 'clickup',
+        'pricing_url': 'https://clickup.com/pricing',
+    },
+    'linear': {
+        'levelsfyi_slug': 'linear',
+        'pricing_url': 'https://linear.app/pricing',
+    },
+}
+
+
+def get_custom_careers_info(company_name: str) -> dict | None:
+    """Get custom careers info for companies without standard ATS."""
+    name_lower = company_name.lower().replace(' ', '').replace('.', '')
+    for key, info in CUSTOM_CAREERS.items():
+        if key.lower().replace(' ', '').replace('.', '') == name_lower:
+            return info
+    return None
 
 
 def try_common_ats_urls(company_name: str) -> dict | None:
@@ -106,6 +217,7 @@ def try_common_ats_urls(company_name: str) -> dict | None:
             return {"type": "ashby", "url": f"https://jobs.ashbyhq.com/{s}"}
 
     return None
+
 
 load_dotenv()
 
@@ -137,7 +249,8 @@ def suggest_competitors(user_description: str, num_competitors: int = 5, max_ret
 When given a product or company description, identify direct competitors in that market.
 Return a JSON array of objects with "name" and "domain" fields.
 The domain should be the company's main website (e.g., "asana.com", "linear.app").
-Example output: [{"name": "Asana", "domain": "asana.com"}, {"name": "Linear", "domain": "linear.app"}]"""
+Example output: [{"name": "Asana", "domain": "asana.com"}, {"name": "Linear", "domain": "linear.app"}]
+"""
 
     user_prompt = f"""Identify {num_competitors} direct competitors for the following:
 
@@ -151,7 +264,8 @@ Return a JSON array with name and domain for each competitor."""
     )
 
     # Transient error indicators
-    retryable_errors = ['429', '503', 'RESOURCE_EXHAUSTED', 'UNAVAILABLE', 'overloaded']
+    retryable_errors = ['429', '503',
+                        'RESOURCE_EXHAUSTED', 'UNAVAILABLE', 'overloaded']
 
     for attempt in range(max_retries):
         try:
@@ -187,7 +301,8 @@ Return a JSON array with name and domain for each competitor."""
 
             if is_retryable and attempt < max_retries - 1:
                 wait_time = (2 ** attempt) * 2  # 2s, 4s, 8s, 16s, 32s
-                print(f"⚠️  API overloaded (attempt {attempt + 1}/{max_retries}). Retrying in {wait_time}s...")
+                print(
+                    f"⚠️  API overloaded (attempt {attempt + 1}/{max_retries}). Retrying in {wait_time}s...")
                 time.sleep(wait_time)
             else:
                 print(f"Gemini API error: {e}")
@@ -199,11 +314,64 @@ Return a JSON array with name and domain for each competitor."""
 # 2. The Hands: Find the URLs
 
 
-def verify_url(url: str, headers: dict) -> bool:
-    """Check if a URL returns 200 OK."""
+def _find_pricing_link_from_page(base_url: str, headers: dict) -> str | None:
+    """
+    Scrape a page (usually homepage) to find a pricing link in navigation.
+    Returns the full pricing URL if found, None otherwise.
+    """
     try:
-        resp = requests.head(url, headers=headers, timeout=5, allow_redirects=True)
-        return resp.status_code == 200
+        resp = requests.get(base_url, headers=headers, timeout=15)
+        if resp.status_code != 200:
+            return None
+
+        soup = BeautifulSoup(resp.text, 'html.parser')
+
+        # Look for links containing "pricing", "plans", "price" in href or text
+        pricing_keywords = ['pricing', 'plans', 'price', 'packages']
+
+        for link in soup.find_all('a', href=True):
+            href = link.get('href', '').lower()
+            text = link.get_text(strip=True).lower()
+
+            # Check if link text or href contains pricing keywords
+            for keyword in pricing_keywords:
+                if keyword in href or keyword in text:
+                    full_url = href
+
+                    # Handle relative URLs
+                    if href.startswith('/'):
+                        parsed = urlparse(base_url)
+                        full_url = f"{parsed.scheme}://{parsed.netloc}{href}"
+                    elif not href.startswith('http'):
+                        full_url = f"{base_url.rstrip('/')}/{href}"
+
+                    # Verify the URL actually works
+                    if verify_url(full_url, headers):
+                        return full_url
+
+        return None
+    except Exception:
+        return None
+
+
+def verify_url(url: str, headers: dict) -> bool:
+    """
+    Check if a URL is accessible and returns valid content.
+    Uses GET with stream=True to avoid downloading full content,
+    since many sites block HEAD requests.
+    """
+    try:
+        # Use GET with stream=True - more reliable than HEAD
+        # Many sites block HEAD or return incorrect status codes
+        resp = requests.get(url, headers=headers, timeout=10,
+                            allow_redirects=True, stream=True)
+        # Check for success status and that we didn't get redirected to a 404/error page
+        if resp.status_code == 200:
+            # Quick check that it's actually a pricing/content page, not a redirect to homepage
+            content_type = resp.headers.get('content-type', '')
+            if 'text/html' in content_type or 'application/json' in content_type:
+                return True
+        return False
     except requests.RequestException:
         return False
 
@@ -241,36 +409,76 @@ def find_company_links(competitor: dict) -> dict:
         "careers_url": None,
         "careers_verified": False,
         "ats_url": None,
-        "ats_type": None
+        "ats_type": None,
+        "levelsfyi_slug": None,  # For companies without ATS
     }
 
-    # Try common pricing page paths
-    pricing_paths = ["/pricing", "/plans", "/plans-pricing", "/pricing/", "/product/pricing"]
-    for path in pricing_paths:
-        pricing_url = f"{domain.rstrip('/')}{path}"
-        if verify_url(pricing_url, headers):
-            data["pricing_url"] = pricing_url
-            data["pricing_verified"] = True
-            print(f"  ✓ Pricing: {pricing_url}")
-            break
-
-    if not data["pricing_url"]:
-        data["pricing_url"] = f"{domain.rstrip('/')}/pricing"
-        print(f"  ? Pricing (unverified): {data['pricing_url']}")
-
-    # Try common careers page paths
-    careers_paths = ["/jobs/all", "/careers", "/jobs", "/about/careers", "/company/careers"]
-    for path in careers_paths:
-        careers_url = f"{domain.rstrip('/')}{path}"
-        if verify_url(careers_url, headers):
-            data["careers_url"] = careers_url
+    # Check if this company has known custom career page info
+    custom_info = get_custom_careers_info(name)
+    if custom_info:
+        data["levelsfyi_slug"] = custom_info.get("levelsfyi_slug")
+        if custom_info.get("careers_url"):
+            data["careers_url"] = custom_info["careers_url"]
             data["careers_verified"] = True
-            print(f"  ✓ Careers: {careers_url}")
-            break
+            print(f"  ✓ Known custom careers: {data['careers_url']}")
+        if custom_info.get("pricing_url"):
+            data["pricing_url"] = custom_info["pricing_url"]
+            data["pricing_verified"] = True
+            print(f"  ✓ Known pricing URL: {data['pricing_url']}")
 
-    if not data["careers_url"]:
-        data["careers_url"] = f"{domain.rstrip('/')}/careers"
-        print(f"  ? Careers (unverified): {data['careers_url']}")
+    # Try common pricing page paths (skip if already set from custom info)
+    if not data["pricing_verified"]:
+        # Extended list of common pricing paths
+        pricing_paths = [
+            "/pricing",
+            "/pricing/",
+            "/plans",
+            "/plans/",
+            "/plans-pricing",
+            "/product/pricing",
+            "/products/pricing",
+            "/price",
+            "/prices",
+            "/packages",
+            "/subscribe",
+            "/buy",
+        ]
+        for path in pricing_paths:
+            pricing_url = f"{domain.rstrip('/')}{path}"
+            if verify_url(pricing_url, headers):
+                data["pricing_url"] = pricing_url
+                data["pricing_verified"] = True
+                print(f"  ✓ Pricing: {pricing_url}")
+                break
+
+        # Fallback: Try to find pricing link from homepage navigation
+        if not data["pricing_verified"]:
+            print(f"  Searching homepage for pricing link...")
+            pricing_url = _find_pricing_link_from_page(domain, headers)
+            if pricing_url:
+                data["pricing_url"] = pricing_url
+                data["pricing_verified"] = True
+                print(f"  ✓ Pricing (from nav): {pricing_url}")
+
+        if not data["pricing_url"]:
+            data["pricing_url"] = f"{domain.rstrip('/')}/pricing"
+            print(f"  ? Pricing (unverified): {data['pricing_url']}")
+
+    # Try common careers page paths (skip if already set from custom info)
+    if not data["careers_verified"]:
+        careers_paths = ["/jobs/all", "/careers",
+                         "/jobs", "/about/careers", "/company/careers"]
+        for path in careers_paths:
+            careers_url = f"{domain.rstrip('/')}{path}"
+            if verify_url(careers_url, headers):
+                data["careers_url"] = careers_url
+                data["careers_verified"] = True
+                print(f"  ✓ Careers: {careers_url}")
+                break
+
+        if not data["careers_url"]:
+            data["careers_url"] = f"{domain.rstrip('/')}/careers"
+            print(f"  ? Careers (unverified): {data['careers_url']}")
 
     return data
 
@@ -319,13 +527,14 @@ def extract_ats_from_careers(careers_url):
 
 def run_discovery(user_input):
     print("🧠 Asking Gemini for competitors...")
-    competitors = suggest_competitors(user_input)
+    competitors = suggest_competitors(user_input, num_competitors=1)
 
     if not competitors:
         print("No competitors found.")
         return []
 
-    print(f"Found {len(competitors)} competitors: {[c.get('name') for c in competitors]}\n")
+    print(
+        f"Found {len(competitors)} competitors: {[c.get('name') for c in competitors]}\n")
 
     full_dossiers = []
 
@@ -344,10 +553,12 @@ def run_discovery(user_input):
 
                 if ats_result:
                     # Clean up embed/version params from URL
-                    clean_url = ats_result.get("url", "").split("?")[0].split("/embed")[0]
+                    clean_url = ats_result.get("url", "").split("?")[
+                        0].split("/embed")[0]
                     links["ats_url"] = clean_url
                     links["ats_type"] = ats_result.get("type")
-                    print(f"  ✓ Found {ats_result.get('type').upper()}: {clean_url}")
+                    print(
+                        f"  ✓ Found {ats_result.get('type').upper()}: {clean_url}")
                 else:
                     print(f"  ✗ No ATS detected (may use custom system)")
             full_dossiers.append(links)

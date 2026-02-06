@@ -1,18 +1,13 @@
 {
   "company": "ClickUp",
-  "ats_url": "https://jobs.ashbyhq.com/clickup",
-  "timestamp": "2026-02-05T18:01:18.830706",
-  "job_count": 84,
+  "ats_url": "ashby:https://jobs.ashbyhq.com/clickup",
+  "timestamp": "2026-02-06T14:49:51.856322",
+  "job_count": 78,
   "jobs": [
     {
       "title": "Analytics Engineer",
       "location": "India",
       "department": "Customer Experience"
-    },
-    {
-      "title": "Business Development Representative",
-      "location": "United States - San Diego Office",
-      "department": "Business Dev Rep"
     },
     {
       "title": "Business Development Representative",
@@ -55,11 +50,6 @@
       "department": "Marketing HQ"
     },
     {
-      "title": "Executive Assistant ",
-      "location": "Philippines",
-      "department": "Engineering HQ"
-    },
-    {
       "title": "Fixed Term Senior Talent Acquisition Partner",
       "location": "Czechia",
       "department": "Recruiting"
@@ -98,11 +88,6 @@
       "title": "Manager, Software Engineering",
       "location": "United States of America",
       "department": "Backend Engineering"
-    },
-    {
-      "title": "Market Development Representative",
-      "location": "Philippines",
-      "department": "Sales Development Rep"
     },
     {
       "title": "Mid-Market Account Executive",
@@ -153,11 +138,6 @@
       "title": "Renewal Specialist (APAC)",
       "location": "Philippines",
       "department": "Customer Operations"
-    },
-    {
-      "title": "Sales Development Representative",
-      "location": "United States - Dallas Office ",
-      "department": "Sales Development Rep"
     },
     {
       "title": "Sales Development Representative",
@@ -236,11 +216,6 @@
     },
     {
       "title": "Senior Frontend Engineer",
-      "location": "Poland",
-      "department": "Front End Engineering"
-    },
-    {
-      "title": "Senior Frontend Engineer",
       "location": "United States of America",
       "department": "Front End Engineering"
     },
@@ -282,11 +257,6 @@
     {
       "title": "Senior Mobile Engineer",
       "location": "United Kingdom",
-      "department": "Backend Engineering"
-    },
-    {
-      "title": "Senior Mobile Engineer",
-      "location": "United States of America",
       "department": "Backend Engineering"
     },
     {

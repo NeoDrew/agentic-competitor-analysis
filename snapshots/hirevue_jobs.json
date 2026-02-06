@@ -1,0 +1,28 @@
+{
+  "company": "HireVue",
+  "ats_url": "linkedin:HireVue",
+  "timestamp": "2026-02-06T15:48:50.418243",
+  "job_count": 4,
+  "jobs": [
+    {
+      "title": "Customer Success Director | Remote US",
+      "department": "Customer Success",
+      "location": "South Jordan, UT"
+    },
+    {
+      "title": "Renewals Manager | Fully Remote US",
+      "department": "General",
+      "location": "South Jordan, UT"
+    },
+    {
+      "title": "Product Manager | Fully Remote USA",
+      "department": "Product",
+      "location": "South Jordan, UT"
+    },
+    {
+      "title": "Financial Planning & Analysis Analyst | Fully Remote US",
+      "department": "General",
+      "location": "South Jordan, UT"
+    }
+  ]
+}

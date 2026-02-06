@@ -17,8 +17,13 @@ from google import genai
 from google.genai import types
 
 from discovery import suggest_competitors, find_company_links, try_common_ats_urls
-from ghost_probe import detect_ats, fetch_jobs, analyze_hiring_trends
+from ghost_probe import (
+    detect_ats, fetch_jobs, analyze_hiring_trends,
+    fetch_jobs_from_levelsfyi, fetch_jobs_from_linkedin, fetch_jobs_direct_careers
+)
 from sentinel_probe import get_current_state, get_historical_state, analyze_diff
+from background_probe import gather_company_background
+from spy_report import analyze_homepage
 
 # Directory for storing job snapshots (for future comparison)
 SNAPSHOTS_DIR = "snapshots"
@@ -226,6 +231,70 @@ async def generate_executive_summary(result: dict, max_retries: int = 5) -> str:
             roles_str = ", ".join([r.get('title', '')[:50] for r in new_roles[:5]])
             context_parts.append(f"New roles added: {roles_str}")
 
+    # Background context
+    background = result.get('background', {})
+    if background and isinstance(background, dict):
+        summary = background.get('summary', {})
+        if summary:
+            context_parts.append("\n=== COMPANY BACKGROUND ===")
+
+            if summary.get('founded'):
+                context_parts.append(f"Founded: {summary['founded']}")
+            if summary.get('founders'):
+                context_parts.append(f"Founders: {summary['founders']}")
+            if summary.get('headquarters'):
+                context_parts.append(f"Headquarters: {summary['headquarters']}")
+            if summary.get('employees'):
+                context_parts.append(f"Employees: {summary['employees']}")
+            if summary.get('funding'):
+                context_parts.append(f"Total funding: ${summary['funding']}")
+            if summary.get('industry'):
+                context_parts.append(f"Industry: {summary['industry']}")
+            if summary.get('description'):
+                # Truncate description
+                desc = summary['description'][:300]
+                context_parts.append(f"Description: {desc}...")
+
+        # Recent news
+        news = background.get('recent_news', [])
+        if news:
+            context_parts.append("\nRecent news headlines:")
+            for item in news[:3]:
+                context_parts.append(f"  - {item.get('title', '')[:80]}")
+
+        # GitHub activity
+        github = background.get('github', {})
+        if github:
+            repos = github.get('public_repos', 0)
+            stars = github.get('total_stars', 0)
+            if repos or stars:
+                context_parts.append(f"\nOpen source: {repos} repos, {stars} stars")
+
+    # Homepage analysis context
+    homepage = result.get('homepage_analysis', {})
+    if homepage and isinstance(homepage, dict) and 'error' not in homepage:
+        context_parts.append("\n=== HOMEPAGE INTELLIGENCE ===")
+        new_state = homepage.get('new_state', {})
+        analysis = homepage.get('analysis', {})
+
+        if new_state:
+            hero = new_state.get('hero_headline', '')
+            if hero:
+                context_parts.append(f"Current positioning: {hero}")
+            audience = new_state.get('target_audience', '')
+            if audience:
+                context_parts.append(f"Target audience: {audience}")
+            value_props = new_state.get('value_propositions', [])
+            if value_props:
+                context_parts.append(f"Value props: {', '.join(value_props[:3])}")
+
+        if analysis:
+            change_detected = analysis.get('change_detected', False)
+            if change_detected:
+                shift = analysis.get('strategic_shift', '')
+                if shift:
+                    context_parts.append(f"Homepage strategic shift: {shift}")
+
     context = "\n".join(context_parts)
 
     # Evaluator prompt
@@ -309,68 +378,209 @@ async def analyze_competitor(competitor: dict, months_ago: int = 6) -> dict:
         'pricing_analysis': None,
         'hiring_analysis': None,
         'hiring_trends': None,
+        'homepage_analysis': None,
         'timestamp': datetime.now().isoformat()
     }
 
     # --- 1. Pricing/Positioning Analysis (Sentinel Probe) ---
-    if pricing_url and competitor.get('pricing_verified', False):
+    # Try pricing analysis even if not verified - the URL might still work
+    if pricing_url:
         print(f"\n📊 Running Sentinel Probe on {pricing_url}...")
         try:
             # Get current state
             current_md = await get_current_state(pricing_url)
 
-            # Get historical state
-            old_md, snapshot_url = get_historical_state(pricing_url, months_ago)
-
-            if old_md and current_md:
-                print(f"  Found historical snapshot from ~{months_ago} months ago")
-                # Run AI analysis
-                analysis = await analyze_diff(
-                    old_md=old_md,
-                    new_md=current_md,
-                    target_url=pricing_url
-                )
-                result['pricing_analysis'] = analysis
-                result['historical_snapshot'] = snapshot_url
-                print(f"  ✓ Pricing analysis complete")
+            if not current_md or len(current_md.strip()) < 100:
+                print(f"  ⚠ Could not fetch pricing page content")
             else:
-                print(f"  ⚠ No historical data found for pricing comparison")
+                # Get historical state
+                old_md, snapshot_url = get_historical_state(pricing_url, months_ago)
+
+                if old_md and current_md:
+                    print(f"  Found historical snapshot from ~{months_ago} months ago")
+                    # Run full diff analysis
+                    analysis = await analyze_diff(
+                        old_md=old_md,
+                        new_md=current_md,
+                        target_url=pricing_url
+                    )
+                    result['pricing_analysis'] = analysis
+                    result['historical_snapshot'] = snapshot_url
+                    print(f"  ✓ Pricing analysis complete (with historical comparison)")
+                elif current_md:
+                    # No historical data - still analyze current pricing
+                    print(f"  ⚠ No historical snapshot, analyzing current pricing only...")
+                    analysis = await analyze_diff(
+                        old_md=None,
+                        new_md=current_md,
+                        target_url=pricing_url
+                    )
+                    result['pricing_analysis'] = analysis
+                    print(f"  ✓ Current pricing analysis complete (no historical data)")
         except Exception as e:
             print(f"  ✗ Pricing analysis failed: {e}")
     else:
-        print(f"\n📊 Skipping pricing analysis (URL not verified)")
+        print(f"\n📊 Skipping pricing analysis (no pricing URL)")
 
     # --- 2. Job Listings Analysis (Ghost Probe) ---
+    # Strategy: Try multiple sources and aggregate for comprehensive coverage
+    jobs = []
+    job_sources = []
+
+    def _dedupe_jobs(job_list: list[dict]) -> list[dict]:
+        """Deduplicate jobs by title (case-insensitive)."""
+        seen = set()
+        unique = []
+        for job in job_list:
+            # Normalize title for comparison
+            title_key = job.get('title', '').lower().strip()
+            if title_key and title_key not in seen:
+                seen.add(title_key)
+                unique.append(job)
+        return unique
+
+    # Source 1: ATS (Greenhouse/Lever/Ashby APIs - returns ALL jobs)
     if ats_url and ats_type:
         print(f"\n👻 Running Ghost Probe on {ats_url}...")
         try:
-            jobs = fetch_jobs(ats_url, ats_type)
-
-            if not jobs:
-                print(f"  ⚠ No jobs found (ATS may be invalid or empty)")
+            ats_jobs = fetch_jobs(ats_url, ats_type)
+            if ats_jobs:
+                jobs.extend(ats_jobs)
+                job_sources.append(f"{ats_type}:{ats_url}")
+                print(f"  ✓ ATS returned {len(ats_jobs)} positions")
             else:
-                print(f"  Found {len(jobs)} open positions")
-
-                # Analyze current jobs
-                result['hiring_analysis'] = analyze_jobs_with_ai(jobs, name)
-
-                # Load previous snapshot for trend comparison
-                previous_jobs = load_previous_snapshot(name)
-                if previous_jobs:
-                    print(f"  Comparing with previous snapshot ({len(previous_jobs)} jobs)")
-                    result['hiring_trends'] = analyze_hiring_trends(previous_jobs, jobs)
-                else:
-                    print(f"  No previous snapshot (first run)")
-
-                # Save current as new snapshot
-                save_snapshot(name, jobs, ats_url)
-
+                print(f"  ⚠ No jobs found from ATS")
         except Exception as e:
-            print(f"  ✗ Job analysis failed: {e}")
-    else:
-        print(f"\n👻 Skipping job analysis (no ATS detected)")
+            print(f"  ✗ ATS fetch failed: {e}")
 
-    # --- 3. Executive Summary (Evaluator Agent) ---
+    # Source 2: levels.fyi (supplementary - limited to ~15 jobs but may have different listings)
+    levelsfyi_slug = competitor.get('levelsfyi_slug') or name
+    if not jobs or len(jobs) < 20:  # Try if no jobs or few jobs from ATS
+        print(f"\n👻 Checking levels.fyi for additional jobs...")
+        try:
+            levelsfyi_jobs = fetch_jobs_from_levelsfyi(levelsfyi_slug)
+            if levelsfyi_jobs:
+                jobs.extend(levelsfyi_jobs)
+                job_sources.append(f"levels.fyi/{levelsfyi_slug}")
+                result['levelsfyi_url'] = f"https://www.levels.fyi/jobs/company/{levelsfyi_slug.lower().replace(' ', '').replace('.', '')}"
+        except Exception as e:
+            print(f"  ✗ levels.fyi failed: {e}")
+
+    # Source 3: LinkedIn (supplementary - may have jobs not listed elsewhere)
+    if not jobs or len(jobs) < 30:  # Try if still need more coverage
+        print(f"\n👻 Checking LinkedIn for additional jobs...")
+        try:
+            linkedin_jobs = fetch_jobs_from_linkedin(name, max_results=100)
+            if linkedin_jobs:
+                jobs.extend(linkedin_jobs)
+                job_sources.append(f"linkedin:{name}")
+        except Exception as e:
+            print(f"  ✗ LinkedIn failed: {e}")
+
+    # Source 4: Direct careers page with AI extraction (last resort)
+    if not jobs and competitor.get('careers_url'):
+        print(f"\n👻 Trying AI extraction from careers page...")
+        try:
+            direct_jobs = fetch_jobs_direct_careers(competitor['careers_url'], name)
+            if direct_jobs:
+                jobs.extend(direct_jobs)
+                job_sources.append(f"direct:{competitor['careers_url']}")
+        except Exception as e:
+            print(f"  ✗ Direct extraction failed: {e}")
+
+    # Deduplicate jobs from all sources
+    if jobs:
+        original_count = len(jobs)
+        jobs = _dedupe_jobs(jobs)
+        if original_count != len(jobs):
+            print(f"  📋 Deduplicated: {original_count} → {len(jobs)} unique jobs")
+
+    job_source = " + ".join(job_sources) if job_sources else None
+
+    # Process jobs if we have any
+    if jobs:
+        print(f"  ✓ Total: {len(jobs)} jobs from {job_source}")
+        result['job_source'] = job_source
+
+        # Analyze current jobs
+        result['hiring_analysis'] = analyze_jobs_with_ai(jobs, name)
+
+        # Load previous snapshot for trend comparison
+        previous_jobs = load_previous_snapshot(name)
+        if previous_jobs:
+            print(f"  Comparing with previous snapshot ({len(previous_jobs)} jobs)")
+            result['hiring_trends'] = analyze_hiring_trends(previous_jobs, jobs)
+        else:
+            print(f"  No previous snapshot (first run)")
+
+        # Save current as new snapshot
+        save_snapshot(name, jobs, job_source or 'unknown')
+    else:
+        print(f"\n👻 No job data available for {name} (tried ATS, levels.fyi, direct)")
+
+    # --- 3. Background Intelligence (Background Probe) ---
+    print(f"\n🔍 Running Background Probe...")
+    try:
+        domain = competitor.get('domain', '').replace('https://', '').replace('http://', '')
+        background = gather_company_background(
+            company_name=name,
+            domain=domain,
+            include_news=True,
+            include_github=True
+        )
+
+        # Store full background data for the report
+        result['background'] = {
+            'summary': background.get('summary', {}),
+            'sources_used': list(background.get('sources', {}).keys()),
+            'wikipedia': background.get('sources', {}).get('wikipedia'),
+            'recent_news': background.get('sources', {}).get('news', [])[:5],
+            'github': background.get('sources', {}).get('github'),
+        }
+
+        # Extract key facts for display
+        summary = background.get('summary', {})
+        facts = []
+        if summary.get('founded'):
+            facts.append(f"Founded: {summary['founded']}")
+        if summary.get('employees'):
+            facts.append(f"Employees: {summary['employees']}")
+        if summary.get('funding'):
+            facts.append(f"Funding: ${summary['funding']}")
+        if summary.get('headquarters'):
+            facts.append(f"HQ: {summary['headquarters']}")
+
+        if facts:
+            print(f"  ✓ Background: {', '.join(facts)}")
+        else:
+            print(f"  ✓ Background gathered from {len(result['background']['sources_used'])} sources")
+    except Exception as e:
+        print(f"  ✗ Background probe failed: {e}")
+        result['background'] = None
+
+    # --- 4. Homepage Analysis (Spy Report) ---
+    domain = competitor.get('domain', '')
+    if domain:
+        homepage_url = f"https://{domain.replace('https://', '').replace('http://', '')}"
+        print(f"\n🕵️ Running Spy Report on {homepage_url}...")
+        try:
+            homepage_result = await analyze_homepage(homepage_url, months_ago)
+            if homepage_result and 'error' not in homepage_result:
+                result['homepage_analysis'] = homepage_result
+                change_detected = homepage_result.get('analysis', {}).get('change_detected', False)
+                if change_detected:
+                    shift = homepage_result.get('analysis', {}).get('strategic_shift', 'Changes detected')
+                    print(f"  ✓ Homepage analysis complete: {shift[:60]}...")
+                else:
+                    print(f"  ✓ Homepage analysis complete (no major changes)")
+            else:
+                print(f"  ⚠ Homepage analysis failed: {homepage_result.get('error', 'Unknown error')}")
+        except Exception as e:
+            print(f"  ✗ Homepage analysis failed: {e}")
+    else:
+        print(f"\n🕵️ Skipping homepage analysis (no domain)")
+
+    # --- 5. Executive Summary (Evaluator Agent) ---
     print(f"\n🎯 Running Evaluator Agent...")
     try:
         executive_summary = await generate_executive_summary(result)
@@ -561,6 +771,20 @@ def print_summary(results: list[dict]):
                 trend_summary = trends.get('summary')
                 if trend_summary:
                     print(f"  📈 Trend: {trend_summary}")
+
+            # Background
+            background = r.get('background', {})
+            if background and isinstance(background, dict):
+                summary = background.get('summary', {})
+                bg_parts = []
+                if summary.get('founded'):
+                    bg_parts.append(f"Founded: {summary['founded']}")
+                if summary.get('employees'):
+                    bg_parts.append(f"Employees: {summary['employees']}")
+                if summary.get('headquarters'):
+                    bg_parts.append(f"HQ: {summary['headquarters']}")
+                if bg_parts:
+                    print(f"  🏢 Background: {', '.join(bg_parts)}")
 
 
 def main():

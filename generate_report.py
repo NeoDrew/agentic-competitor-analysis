@@ -28,6 +28,15 @@ LATEX_TEMPLATE = r"""
 \usepackage{textcomp}
 \usepackage{enumitem}
 \usepackage{fancyhdr}
+\usepackage{hyperref}
+
+% Hyperlink setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=accent,
+    urlcolor=accent,
+    breaklinks=true
+}
 
 % Define Colors
 \definecolor{navy}{RGB}{10, 25, 60}
@@ -78,12 +87,18 @@ LATEX_TEMPLATE = r"""
 % === KEY METRICS ===
 <<KEY_METRICS>>
 
+% === COMPANY BACKGROUND ===
+<<BACKGROUND_SECTION>>
+
 % === PRICING ANALYSIS ===
 \vspace{0.8cm}
 \noindent{\Large\textbf{\textcolor{navy}{Pricing Analysis}}}
 \vspace{0.4cm}
 
 <<PRICING_SECTION>>
+
+% === HOMEPAGE INTELLIGENCE ===
+<<HOMEPAGE_SECTION>>
 
 % === HIRING INTELLIGENCE ===
 <<HIRING_SECTION>>
@@ -184,8 +199,8 @@ def format_pricing_table(old_plans, new_plans) -> str:
     return "\n".join(lines)
 
 
-def format_hiring_section(hiring_analysis, hiring_trends) -> str:
-    """Format hiring analysis as LaTeX."""
+def format_hiring_section(hiring_analysis, hiring_trends, result: dict = None) -> str:
+    """Format hiring analysis as LaTeX with source links."""
     if not hiring_analysis:
         return r"\vspace{0.8cm}" + "\n" + r"\noindent{\Large\textbf{\textcolor{navy}{Hiring Intelligence}}}" + "\n" + r"\vspace{0.4cm}" + "\n\n" + r"\textit{No hiring data available (ATS not detected or unsupported).}"
 
@@ -271,6 +286,275 @@ def format_hiring_section(hiring_analysis, hiring_trends) -> str:
         if new_roles:
             lines.append(r"\newline\textbf{New Roles:} " + ", ".join([escape_latex(r.get('title', ''))[:40] for r in new_roles[:3]]))
 
+    # Add job source link with proper spacing
+    if result:
+        job_source_url = result.get('ats_url') or result.get('levelsfyi_url')
+        if not job_source_url and 'linkedin' in result.get('job_source', '').lower():
+            name = result.get('name', '')
+            job_source_url = f"https://www.linkedin.com/company/{name.lower().replace(' ', '-')}/jobs/"
+        if job_source_url:
+            lines.append(r"\vspace{0.8cm}")  # More space before source
+            lines.append(f"\\noindent\\textit{{\\small Source: \\url{{{escape_latex(job_source_url)}}}}}")
+
+    return "\n".join(lines)
+
+
+def is_valid_description(desc: str) -> bool:
+    """Check if description is valid (not a login page or error)."""
+    if not desc:
+        return False
+    invalid_patterns = [
+        'login to linkedin',
+        'sign in',
+        'log in to',
+        'create an account',
+        'keep in touch with people you know',
+    ]
+    desc_lower = desc.lower()
+    return not any(pattern in desc_lower for pattern in invalid_patterns)
+
+
+def format_background_section(background: dict, result: dict = None) -> str:
+    """Format company background as LaTeX with proper links."""
+    if not background:
+        return ""
+
+    summary = background.get('summary', {})
+    if not summary or len(summary) <= 2:  # Only has 'name' and maybe 'website'
+        return ""
+
+    lines = []
+    lines.append(r"\vspace{0.8cm}")
+    lines.append(r"\noindent{\Large\textbf{\textcolor{navy}{Company Background}}}")
+    lines.append(r"\par\vspace{0.5cm}")  # Force new line after header
+
+    # Helper to check if value is valid (not Wikipedia parsing junk)
+    def is_valid_field(val):
+        if not val:
+            return False
+        val_str = str(val).strip()
+        # Filter out Wikipedia infobox parsing artifacts
+        if '|' in val_str or '=' in val_str or val_str.startswith('{') or val_str.startswith('['):
+            return False
+        return len(val_str) > 0
+
+    # Key facts - each on its own line for clarity
+    facts_lines = []
+    if is_valid_field(summary.get('founded')):
+        facts_lines.append(f"\\textbf{{Founded:}} {escape_latex(str(summary['founded']))}")
+    if is_valid_field(summary.get('headquarters')):
+        facts_lines.append(f"\\textbf{{Headquarters:}} {escape_latex(str(summary['headquarters']))}")
+    if is_valid_field(summary.get('employees')):
+        facts_lines.append(f"\\textbf{{Employees:}} {escape_latex(str(summary['employees']))}")
+    if is_valid_field(summary.get('funding')):
+        facts_lines.append(f"\\textbf{{Funding:}} \\${escape_latex(str(summary['funding']))}")
+    if is_valid_field(summary.get('industry')):
+        facts_lines.append(f"\\textbf{{Industry:}} {escape_latex(str(summary['industry']))}")
+
+    if facts_lines:
+        lines.append(r"\noindent")
+        lines.append(" \\quad | \\quad ".join(facts_lines))
+        lines.append(r"\vspace{0.4cm}")  # Space after facts
+
+    # Founders
+    if summary.get('founders'):
+        lines.append(r"")
+        lines.append(r"\noindent\textbf{\textcolor{accent}{Founders:}}")
+        lines.append(r"\par\noindent")  # Force paragraph break
+        lines.append(escape_latex(str(summary['founders'])))
+        lines.append(r"")
+        lines.append(r"\vspace{0.4cm}")  # Space after founders
+
+    # Description - filter out LinkedIn login page errors
+    desc = summary.get('description', '')
+    if is_valid_description(desc):
+        # Don't truncate - show full description
+        desc_text = str(desc)
+        lines.append(r"")
+        lines.append(r"\noindent\textbf{\textcolor{accent}{Overview:}}")
+        lines.append(r"\par\noindent")  # Force paragraph break
+        lines.append(f"{escape_latex(desc_text)}")
+        lines.append(r"")
+        lines.append(r"\vspace{0.4cm}")  # Space after overview
+
+    # Mission statement (if different from description)
+    mission = summary.get('mission', '')
+    if mission and mission != desc and is_valid_description(mission):
+        mission_text = str(mission)
+        lines.append(r"")
+        lines.append(r"\noindent\textbf{\textcolor{accent}{Mission:}}")
+        lines.append(r"\par\noindent")  # Force paragraph break
+        lines.append(f"{escape_latex(mission_text)}")
+        lines.append(r"")
+        lines.append(r"\vspace{0.4cm}")  # Space after mission
+
+    # Recent news - show full titles with links
+    news = background.get('recent_news', [])
+    if news:
+        lines.append(r"")
+        lines.append(r"\noindent\textbf{\textcolor{accent}{Recent News:}}")
+        lines.append(r"\begin{itemize}")
+        for item in news[:3]:
+            title = str(item.get('title', ''))
+            url = item.get('url', '')
+            if title:
+                if url:
+                    # Make title a clickable link - URL needs minimal escaping, only % and #
+                    safe_url = url.replace('%', r'\%').replace('#', r'\#')
+                    lines.append(f"\\item \\href{{{safe_url}}}{{{escape_latex(title)}}}")
+                else:
+                    lines.append(f"\\item {escape_latex(title)}")
+        lines.append(r"\end{itemize}")
+        lines.append(r"\vspace{0.3cm}")  # Space after news
+
+    # GitHub stats
+    github = background.get('github', {})
+    if github and (github.get('public_repos') or github.get('total_stars')):
+        repos = github.get('public_repos', 0)
+        stars = github.get('total_stars', 0)
+        org_url = github.get('url', '')
+        if org_url:
+            lines.append(f"\\noindent\\textbf{{\\textcolor{{accent}}{{Open Source:}}}} {repos} public repos, {stars:,} total stars (\\url{{{escape_latex(org_url)}}})")
+        else:
+            lines.append(f"\\noindent\\textbf{{\\textcolor{{accent}}{{Open Source:}}}} {repos} public repos, {stars:,} total stars")
+        lines.append(r"\vspace{0.3cm}")
+
+    # Wikipedia source link
+    wiki = background.get('wikipedia', {})
+    if wiki and wiki.get('url'):
+        lines.append(r"\vspace{0.2cm}")
+        lines.append(f"\\noindent\\textit{{\\small Source: \\url{{{escape_latex(wiki.get('url'))}}}}}")
+
+    if len(lines) <= 3:  # Only header, no content
+        return ""
+
+    return "\n".join(lines)
+
+
+def format_homepage_section(homepage_analysis: dict, result: dict = None) -> str:
+    """Format homepage intelligence as LaTeX."""
+    if not homepage_analysis:
+        return ""
+
+    # Check for error
+    if 'error' in homepage_analysis:
+        return ""
+
+    new_state = homepage_analysis.get('new_state') or {}
+    old_state = homepage_analysis.get('old_state') or {}
+    analysis = homepage_analysis.get('analysis') or {}
+
+    # Skip if no meaningful data
+    if not new_state or 'error' in new_state:
+        return ""
+
+    lines = []
+    lines.append(r"\vspace{0.8cm}")
+    lines.append(r"\noindent{\Large\textbf{\textcolor{navy}{Homepage Intelligence}}}")
+    lines.append(r"\par\vspace{0.5cm}")  # Force new line after header
+
+    # Strategic shift summary (if changes detected)
+    change_detected = analysis.get('change_detected', False)
+    if change_detected:
+        shift = analysis.get('strategic_shift', '')
+        magnitude = analysis.get('change_magnitude', 'moderate')
+        if shift:
+            if magnitude == 'major':
+                color = 'signalred'
+            elif magnitude == 'minor':
+                color = 'darkgrey'
+            else:
+                color = 'accent'
+            lines.append(r"\noindent\colorbox{navy!8}{\parbox{\dimexpr\textwidth-2\fboxsep}{")
+            lines.append(r"\vspace{2mm}")
+            lines.append(f"\\textbf{{\\textcolor{{{color}}}{{Strategic Shift:}}}} {escape_latex(shift)}")
+            lines.append(r"\vspace{2mm}")
+            lines.append(r"}}")
+            lines.append(r"\vspace{0.4cm}")
+
+    # Current positioning
+    hero = new_state.get('hero_headline', '')
+    sub_hero = new_state.get('hero_subheadline', '')
+    if hero:
+        lines.append(r"\noindent\textbf{\textcolor{accent}{Current Positioning:}}")
+        lines.append(r"\par\noindent")
+        lines.append(f"``{escape_latex(hero)}''")
+        if sub_hero:
+            lines.append(f" --- {escape_latex(sub_hero)}")
+        lines.append(r"\vspace{0.4cm}")
+
+    # Target audience
+    audience = new_state.get('target_audience', '')
+    if audience:
+        lines.append(r"")
+        lines.append(f"\\noindent\\textbf{{\\textcolor{{accent}}{{Target Audience:}}}} {escape_latex(audience)}")
+        lines.append(r"\vspace{0.3cm}")
+
+    # Key value propositions
+    value_props = new_state.get('value_propositions', [])
+    if value_props:
+        lines.append(r"")
+        lines.append(r"\noindent\textbf{\textcolor{accent}{Value Propositions:}}")
+        lines.append(r"\begin{itemize}")
+        for prop in value_props[:4]:  # Limit to 4
+            lines.append(f"\\item {escape_latex(str(prop))}")
+        lines.append(r"\end{itemize}")
+        lines.append(r"\vspace{0.3cm}")
+
+    # Key features highlighted
+    features = new_state.get('key_features', [])
+    if features:
+        lines.append(r"")
+        lines.append(f"\\noindent\\textbf{{\\textcolor{{accent}}{{Key Features:}}}} {escape_latex(', '.join(features[:5]))}")
+        lines.append(r"\vspace{0.3cm}")
+
+    # Social proof
+    social = new_state.get('social_proof', {})
+    if social:
+        logos = social.get('customer_logos', [])
+        metrics = social.get('metrics', '')
+        if logos:
+            lines.append(r"")
+            lines.append(f"\\noindent\\textbf{{\\textcolor{{accent}}{{Notable Customers:}}}} {escape_latex(', '.join(logos[:5]))}")
+        if metrics:
+            lines.append(r"")
+            lines.append(f"\\noindent\\textbf{{\\textcolor{{accent}}{{Metrics:}}}} {escape_latex(metrics)}")
+        lines.append(r"\vspace{0.3cm}")
+
+    # CTA and tone
+    cta = new_state.get('primary_cta', '')
+    tone = new_state.get('messaging_tone', '')
+    if cta or tone:
+        lines.append(r"")
+        info_parts = []
+        if cta:
+            info_parts.append(f"\\textbf{{CTA:}} {escape_latex(cta)}")
+        if tone:
+            info_parts.append(f"\\textbf{{Tone:}} {escape_latex(tone)}")
+        lines.append(r"\noindent" + " \\quad | \\quad ".join(info_parts))
+        lines.append(r"\vspace{0.3cm}")
+
+    # Evidence of changes (if comparison available)
+    evidence = analysis.get('evidence', {})
+    if evidence and change_detected:
+        lines.append(r"")
+        lines.append(r"\noindent\textbf{\textcolor{accent}{Change Evidence:}}")
+        lines.append(r"\begin{itemize}")
+        for key, value in evidence.items():
+            if value and value != 'No change' and str(value).strip():
+                key_formatted = key.replace('_', ' ').title()
+                lines.append(f"\\item \\textbf{{{escape_latex(key_formatted)}}}: {escape_latex(str(value))}")
+        lines.append(r"\end{itemize}")
+
+    # Source link
+    homepage_url = homepage_analysis.get('url', '')
+    if homepage_url:
+        lines.append(r"\par\vspace{0.5cm}")
+        lines.append(f"\\noindent\\textit{{\\small Source: \\url{{{escape_latex(homepage_url)}}}}}")
+
+    if len(lines) <= 3:  # Only header, no content
+        return ""
+
     return "\n".join(lines)
 
 
@@ -281,19 +565,22 @@ def format_key_metrics(result) -> str:
     pricing = result.get('pricing_analysis', {})
     hiring = result.get('hiring_analysis', {})
 
-    analysis = pricing.get('analysis', {}) if pricing else {}
-    change_detected = analysis.get('change_detected', False)
-
     lines.append(r"\vspace{0.5cm}")
     lines.append(r"\begin{center}")
 
-    # Pricing change indicator
-    if change_detected:
-        pricing_status = "Changed"
-        pricing_color = "accent"
+    # Pricing change indicator - Unknown if no pricing data
+    if not pricing:
+        pricing_status = "Unknown"
+        pricing_color = "darkgrey"
     else:
-        pricing_status = "Stable"
-        pricing_color = "navy"
+        analysis = pricing.get('analysis', {}) if pricing else {}
+        change_detected = analysis.get('change_detected', False)
+        if change_detected:
+            pricing_status = "Changed"
+            pricing_color = "accent"
+        else:
+            pricing_status = "Stable"
+            pricing_color = "navy"
 
     lines.append(r"\colorbox{lightgrey}{\parbox{0.28\textwidth}{\centering\vspace{3mm}{\large\textbf{\textcolor{" + pricing_color + r"}{" + pricing_status + r"}}}\\\vspace{1mm}{\small Pricing Status}\vspace{3mm}}}")
     lines.append(r"\hspace{0.03\textwidth}")
@@ -333,11 +620,13 @@ def generate_report_for_competitor(result: dict, output_dir: str = ".") -> str:
     pricing = result.get('pricing_analysis', {})
     hiring = result.get('hiring_analysis')
     trends = result.get('hiring_trends')
+    background = result.get('background', {})
+    homepage = result.get('homepage_analysis', {})
 
-    # Extract data
-    old_state = pricing.get('old_state', {}) if pricing else {}
-    new_state = pricing.get('new_state', {}) if pricing else {}
-    analysis = pricing.get('analysis', {}) if pricing else {}
+    # Extract data (use 'or {}' to handle explicit None values)
+    old_state = (pricing.get('old_state') or {}) if pricing else {}
+    new_state = (pricing.get('new_state') or {}) if pricing else {}
+    analysis = (pricing.get('analysis') or {}) if pricing else {}
 
     # Verdict - use executive summary from evaluator agent, or fallback
     verdict_text = result.get('executive_summary')
@@ -391,20 +680,63 @@ def generate_report_for_competitor(result: dict, output_dir: str = ".") -> str:
         pricing_section += "\n" + r"\noindent\textbf{\textcolor{accent}{Pricing Comparison:}}" + "\n"
         pricing_section += r"\vspace{0.2cm}" + "\n"
         pricing_section += format_pricing_table(old_plans, new_plans)
+
+        # Add pricing source link
+        pricing_url = result.get('pricing_url')
+        if pricing_url:
+            pricing_section += "\n" + r"\par\vspace{0.5cm}" + "\n"
+            pricing_section += f"\\noindent\\textit{{\\small Source: \\url{{{escape_latex(pricing_url)}}}}}"
     else:
         pricing_section = r"\textit{No pricing data available.}"
+        pricing_url = result.get('pricing_url')
+        if pricing_url:
+            pricing_section += f" (Attempted: \\url{{{escape_latex(pricing_url)}}})"
 
-    hiring_section = format_hiring_section(hiring, trends)
+    hiring_section = format_hiring_section(hiring, trends, result)
     key_metrics = format_key_metrics(result)
+    background_section = format_background_section(background, result)
+    homepage_section = format_homepage_section(homepage, result)
 
-    # Sources
-    sources = []
-    if pricing and pricing.get('url'):
-        sources.append(escape_latex(pricing.get('url')))
+    # Sources - collect as (label, url) tuples
+    source_items = []
+
+    # Pricing source
+    if result.get('pricing_url'):
+        source_items.append(("Pricing", result.get('pricing_url')))
+
+    # Historical snapshot
     if result.get('historical_snapshot'):
-        sources.append("Wayback Machine")
-    if result.get('ats_url'):
-        sources.append(escape_latex(result.get('ats_url')))
+        source_items.append(("Historical", result.get('historical_snapshot')))
+
+    # Job source
+    job_source = result.get('job_source', '')
+    if job_source:
+        # Parse job source to get URL
+        if result.get('ats_url'):
+            source_items.append(("Jobs/ATS", result.get('ats_url')))
+        elif result.get('levelsfyi_url'):
+            source_items.append(("Jobs/Levels.fyi", result.get('levelsfyi_url')))
+        elif 'linkedin' in job_source.lower():
+            source_items.append(("Jobs/LinkedIn", f"https://www.linkedin.com/company/{name.lower().replace(' ', '-')}/jobs/"))
+
+    # Homepage source
+    if homepage and homepage.get('url'):
+        source_items.append(("Homepage", homepage.get('url')))
+
+    # Background sources
+    if background:
+        wiki = background.get('wikipedia', {})
+        if wiki and wiki.get('url'):
+            source_items.append(("Wikipedia", wiki.get('url')))
+        github = background.get('github', {})
+        if github and github.get('url'):
+            source_items.append(("GitHub", github.get('url')))
+
+    # Format sources as clickable links
+    sources = []
+    for label, url in source_items:
+        if url:
+            sources.append(f"{label}: \\url{{{escape_latex(url)}}}")
 
     # Build document - don't double escape
     tex = LATEX_TEMPLATE
@@ -413,9 +745,20 @@ def generate_report_for_competitor(result: dict, output_dir: str = ".") -> str:
     tex = tex.replace("<<TIMESTAMP>>", datetime.now().strftime('%Y-%m-%d %H:%M'))
     tex = tex.replace("<<VERDICT>>", verdict)  # Already escaped
     tex = tex.replace("<<KEY_METRICS>>", key_metrics)
+    tex = tex.replace("<<BACKGROUND_SECTION>>", background_section)
     tex = tex.replace("<<PRICING_SECTION>>", pricing_section)
+    tex = tex.replace("<<HOMEPAGE_SECTION>>", homepage_section)
     tex = tex.replace("<<HIRING_SECTION>>", hiring_section)
-    tex = tex.replace("<<SOURCES>>", ", ".join(sources) if sources else "N/A")
+    # Format sources - use line breaks for readability when many sources
+    if sources:
+        if len(sources) > 2:
+            # Multiple sources - use line breaks
+            sources_text = r" \newline ".join(sources)
+        else:
+            sources_text = " | ".join(sources)
+    else:
+        sources_text = "No external sources available"
+    tex = tex.replace("<<SOURCES>>", sources_text)
 
     # Write and compile
     safe_name = name.lower().replace(" ", "_").replace(".", "")

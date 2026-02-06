@@ -1,0 +1,58 @@
+{
+  "company": "Eightfold AI",
+  "ats_url": "linkedin:Eightfold AI",
+  "timestamp": "2026-02-06T16:08:27.672177",
+  "job_count": 10,
+  "jobs": [
+    {
+      "title": "Machine Learning Engineer - GenAI, LLM, Agentic AI",
+      "department": "Engineering",
+      "location": "Santa Clara, CA"
+    },
+    {
+      "title": "Director - People Business Partner (GTM)",
+      "department": "HR",
+      "location": "Santa Clara, CA"
+    },
+    {
+      "title": "Digital Customer Experience Lead (Customer Operations)",
+      "department": "Customer Success",
+      "location": "Chicago, IL"
+    },
+    {
+      "title": "Competitive Intelligence & Enablement Specialist",
+      "department": "General",
+      "location": "Santa Clara, CA"
+    },
+    {
+      "title": "Digital Campaign Manager - AI Native Startup",
+      "department": "Data",
+      "location": "Santa Clara, CA"
+    },
+    {
+      "title": "Director/Sr. Director, Security and Compliance",
+      "department": "Legal",
+      "location": "Santa Clara, CA"
+    },
+    {
+      "title": "Senior Customer Success Manager - Public Sector",
+      "department": "Customer Success",
+      "location": "New York, NY"
+    },
+    {
+      "title": "Regional Vice President, Agentic Sales",
+      "department": "Sales",
+      "location": "Santa Clara, CA"
+    },
+    {
+      "title": "Software Engineer - Data Platform",
+      "department": "Engineering",
+      "location": "Santa Clara, CA"
+    },
+    {
+      "title": "Public Relations / Communications Specialist - AI Native Tech",
+      "department": "Data",
+      "location": "Santa Clara, CA"
+    }
+  ]
+}

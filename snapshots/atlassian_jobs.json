@@ -1,0 +1,83 @@
+{
+  "company": "Atlassian",
+  "ats_url": "levels.fyi/atlassian",
+  "timestamp": "2026-02-05T18:30:22.212299",
+  "job_count": 15,
+  "jobs": [
+    {
+      "title": "Principal Forward Deployed Engineer, AI (Remote)",
+      "location": "San Francisco, CA",
+      "department": "Engineering"
+    },
+    {
+      "title": "Principal Backend Software Engineer",
+      "location": "Bengaluru, Karnataka, India",
+      "department": "Engineering"
+    },
+    {
+      "title": "Head of Security - Detection and Response",
+      "location": "San Francisco, CA",
+      "department": "General"
+    },
+    {
+      "title": "ACE Program Manager",
+      "location": "United States",
+      "department": "Operations"
+    },
+    {
+      "title": "Senior Customer Success Manager, DX",
+      "location": "New York, NY",
+      "department": "Customer Success"
+    },
+    {
+      "title": "Senior Principal Software Engineer - FedRAMP",
+      "location": "San Francisco, CA",
+      "department": "Engineering"
+    },
+    {
+      "title": "People Data Scientist",
+      "location": "United States",
+      "department": "Data"
+    },
+    {
+      "title": "Principal Backend Software Engineer - Kubernetes",
+      "location": "Carlton, Victoria, Australia",
+      "department": "Engineering"
+    },
+    {
+      "title": "Principal Backend Software Engineer",
+      "location": "Auckland, Auckland, New Zealand",
+      "department": "Engineering"
+    },
+    {
+      "title": "Account Executive, Enterprise Nordics",
+      "location": "United Kingdom",
+      "department": "Sales"
+    },
+    {
+      "title": "Principal Frontend Software Engineer",
+      "location": "Sydney, New South Wales, Australia",
+      "department": "Engineering"
+    },
+    {
+      "title": "Senior Enterprise Delivery Manager, Migrations (AMER)",
+      "location": "San Francisco, CA",
+      "department": "General"
+    },
+    {
+      "title": "Principal Machine Learning Engineer - Central AI",
+      "location": "San Francisco, CA",
+      "department": "Engineering"
+    },
+    {
+      "title": "Principal Product Manager Agentic Platform & Solutions",
+      "location": "Seattle, WA",
+      "department": "Product"
+    },
+    {
+      "title": "Principal Enterprise Delivery Manager, Migrations",
+      "location": "Gda\u0144sk, Pomorskie, Poland",
+      "department": "General"
+    }
+  ]
+}

@@ -1,0 +1,758 @@
+{
+  "company": "GitLab",
+  "ats_url": "greenhouse:https://job-boards.greenhouse.io/gitlab",
+  "timestamp": "2026-02-06T15:13:45.521740",
+  "job_count": 150,
+  "jobs": [
+    {
+      "title": "Account Manager, APAC",
+      "department": "Renewals",
+      "location": "Remote, Singapore"
+    },
+    {
+      "title": "Accounts Receivable Associate ",
+      "department": "Accounting Operations",
+      "location": "Remote, Ireland; Remote, United Kingdom"
+    },
+    {
+      "title": "Assigned Support Engineer (AMER)",
+      "department": "ASE",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Associate Support Engineer (AMER - PST / MST)",
+      "department": "Customer Support",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Backend Engineer, Database Excellence (Ruby)",
+      "department": "Data Engineering",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Business Development Representative - AMER ",
+      "department": "Sales Development",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Business Development Representative - EMEA, Dutch Speaking",
+      "department": "Sales Development",
+      "location": "Remote, EMEA"
+    },
+    {
+      "title": "Commercial Account Executive - Czech",
+      "department": "EMEA - Commercial",
+      "location": "Remote, EMEA; Remote, Germany; Remote, Netherlands; Remote, United Kingdom"
+    },
+    {
+      "title": "Commercial Account Executive, Financial Services  ",
+      "department": "AMER - Commercial",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Commercial Account Executive - Mid Market, DACH",
+      "department": "EMEA - Commercial",
+      "location": "Remote, Germany"
+    },
+    {
+      "title": "Commercial Account Executive - Mid Market, Nordics",
+      "department": "EMEA - Commercial",
+      "location": "Remote, Sweden"
+    },
+    {
+      "title": "Commercial Account Executive - Mid Market - SEA",
+      "department": "APAC - Commercial",
+      "location": "Remote, Singapore"
+    },
+    {
+      "title": "Commercial Account Executive - Mid Market, UK",
+      "department": "EMEA - Commercial",
+      "location": "Remote, United Kingdom"
+    },
+    {
+      "title": "Commercial Account Executive - Mid-Market, West",
+      "department": "AMER - Commercial",
+      "location": "Remote, US"
+    },
+    {
+      "title": "CPQ Developer ",
+      "department": "Enterprise Applications",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Customer Success Architect, EMEA",
+      "department": "Customer Success Architecture",
+      "location": "Remote, Germany; Remote, Ireland; Remote, United Kingdom"
+    },
+    {
+      "title": "Customer Success Manager, DACH",
+      "department": "CSM",
+      "location": "Remote, Germany"
+    },
+    {
+      "title": "CX Platform Engineer - AMER",
+      "department": "Practice Management",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "CX Strategy Manager",
+      "department": "Field Operations",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Developer Relations Engineer",
+      "department": "Developer Relations",
+      "location": "Remote, EMEA"
+    },
+    {
+      "title": "Director, Business Analytics & Insights",
+      "department": "FP&A",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Director Regional Sales, Alps",
+      "department": "EMEA - Enterprise",
+      "location": "Remote"
+    },
+    {
+      "title": "Director, Regional Sales - East",
+      "department": "AMER - Commercial",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Director Regional Sales, Italy",
+      "department": "EMEA - Enterprise",
+      "location": "Remote, Italy"
+    },
+    {
+      "title": "Director Regional Sales, MED",
+      "department": "EMEA - Enterprise",
+      "location": "Remote, Europe"
+    },
+    {
+      "title": "Director, Regional Sales - New Business - DACH / France",
+      "department": "New Business - EMEA",
+      "location": "Remote"
+    },
+    {
+      "title": "Director, Regional Sales - PubSec, Civilian",
+      "department": "PubSec - FED",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Ecosystem Sales Manager - AMER",
+      "department": "Alliances and Channel",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Ecosystem Sales Manager - Brazil",
+      "department": "Alliances and Channel",
+      "location": "Remote, Brazil"
+    },
+    {
+      "title": "Ecosystem Sales Manager, MEA ",
+      "department": "Alliances and Channel",
+      "location": "Remote, United Arab Emirates"
+    },
+    {
+      "title": "Ecosystem Sales Manager, Mediterranean",
+      "department": "Alliances and Channel",
+      "location": "Remote, France; Remote, Germany; Remote, Spain"
+    },
+    {
+      "title": "Ecosystem Sales Manager - Scale - AMER",
+      "department": "Alliances and Channel",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Enablement Data and Reporting Analyst - US Remote",
+      "department": "Enablement",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Enablement Lead, Ecosystem - US Remote",
+      "department": "Enablement",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Engineering Manager, Cloud Capacity, SaaS Production Engineering",
+      "department": "Platforms Engineering",
+      "location": "Remote, APAC"
+    },
+    {
+      "title": "Engineering Manager, Create:Source Code",
+      "department": "DevOps Engineering",
+      "location": "Remote, Americas"
+    },
+    {
+      "title": "Engineering Manager, Database Reliability, Scalability & Operations",
+      "department": "Data Engineering",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Engineering Manager, Gitlab Delivery",
+      "department": "Platforms Engineering",
+      "location": "Remote, Canada; Remote, EMEA"
+    },
+    {
+      "title": "Engineering Manager, Infrastructure Platforms",
+      "department": "Platforms Engineering",
+      "location": "Remote, Canada; Remote, France; Remote, Germany; Remote, Ireland; Remote, Israel; Remote, Netherlands; Remote, Spain; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Engineering Manager, Software Supply Chain Security: Auth Infrastructure",
+      "department": "Sec Engineering",
+      "location": "Remote, Canada; Remote, EMEA; Remote, US"
+    },
+    {
+      "title": "Engineering Manager, Software Supply Chain Security: Pipeline Security ",
+      "department": "Sec Engineering",
+      "location": "Remote, Canada; Remote, Israel; Remote, Netherlands; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Executive Business Administrator, People",
+      "department": "People Business Partners",
+      "location": "Remote"
+    },
+    {
+      "title": "FP&A Analyst, Marketing",
+      "department": "FP&A",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Global Payroll Operations Specialist",
+      "department": "Accounting Operations",
+      "location": "Remote, Canada; Remote, Ireland; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "IBM Ecosystem Sales Manager - AMER",
+      "department": "Alliances and Channel",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Indirect Tax Analyst",
+      "department": "Tax",
+      "location": "Remote, India"
+    },
+    {
+      "title": "Intermediate Backend Engineer (Golang), Monitor: Platform Insights",
+      "department": "Data Engineering",
+      "location": "Remote, APAC"
+    },
+    {
+      "title": "Intermediate Backend Engineer, Verify: Runner Core",
+      "department": "DevOps Engineering",
+      "location": "Remote, Canada"
+    },
+    {
+      "title": "Intermediate Backend (Go) Engineer, Gitlab Delivery -Operate",
+      "department": "Platforms Engineering",
+      "location": "Remote, Canada; Remote, EMEA"
+    },
+    {
+      "title": "Intermediate Site Reliability Engineer, Database Excellence",
+      "department": "Data Engineering",
+      "location": "Remote, EMEA"
+    },
+    {
+      "title": "Intermediate Site Reliability Engineer, Environment Automation",
+      "department": "Platforms Engineering",
+      "location": "Remote, France; Remote, Germany; Remote, Ireland; Remote, Israel; Remote, Netherlands; Remote, Spain; Remote, United Kingdom"
+    },
+    {
+      "title": "Intermediate Site Reliability Engineer, Tenant Scale: Tenant Services",
+      "department": "Platforms Engineering",
+      "location": "Remote, Americas; Remote, EMEA"
+    },
+    {
+      "title": "Intermediate Support Engineer (AMER - PST / MST)",
+      "department": "Customer Support",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Investor Relations Manager",
+      "department": "Office of CFO",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "IT Audit Manager",
+      "department": "Internal Audit",
+      "location": "Remote, Americas"
+    },
+    {
+      "title": "Major Account Executive - DACH ",
+      "department": "EMEA - Enterprise",
+      "location": "Remote, EMEA; Remote, Europe; Remote, Germany"
+    },
+    {
+      "title": "Manager, Customer Success Engineer, EMEA",
+      "department": "CSM",
+      "location": "Remote, France; Remote, Germany; Remote, Netherlands; Remote, Spain"
+    },
+    {
+      "title": "Manager, Customer Success Engineers",
+      "department": "Customer Success Architecture",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Manager, Ecosystem Sales - EMEA South",
+      "department": "Alliances and Channel",
+      "location": "Remote, France; Remote, Spain"
+    },
+    {
+      "title": "Manager, Renewals - AMER",
+      "department": "Renewals",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Manager, Renewals EMEA",
+      "department": "Renewals",
+      "location": "Remote, United Kingdom"
+    },
+    {
+      "title": "Manager, Solutions Architects, France",
+      "department": "SA",
+      "location": "Remote, France"
+    },
+    {
+      "title": "New Business Account Executive, DACH",
+      "department": "New Business - EMEA",
+      "location": "Remote, Germany"
+    },
+    {
+      "title": "New Business Account Executive - East",
+      "department": "New Business - AMER",
+      "location": "Remote, US"
+    },
+    {
+      "title": "New Business Account Executive - Netherlands, Nordics ",
+      "department": "New Business - EMEA",
+      "location": "Remote, Netherlands; Remote, Sweden"
+    },
+    {
+      "title": "New Business Account Executive - Singapore",
+      "department": "New Business - APAC",
+      "location": "Remote, Singapore"
+    },
+    {
+      "title": "New Business Account Executive, UK",
+      "department": "New Business - EMEA",
+      "location": "Remote, United Kingdom"
+    },
+    {
+      "title": "New Business Account Executive - West ",
+      "department": "New Business - AMER",
+      "location": "Remote, US"
+    },
+    {
+      "title": "New Business Commercial Account Executive - Paris",
+      "department": "New Business - EMEA",
+      "location": "Remote, France"
+    },
+    {
+      "title": "Payroll Specialist",
+      "department": "Accounting Operations",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Presales Consultant  - India ( Dehli )",
+      "department": "SA",
+      "location": "Remote, India"
+    },
+    {
+      "title": "Presales Consultant - Japan",
+      "department": "SA",
+      "location": "Remote, Japan"
+    },
+    {
+      "title": "Principal Database Engineer, Data Engineering",
+      "department": "Data Engineering",
+      "location": "Remote, EMEA; Remote, North America"
+    },
+    {
+      "title": "Principal Engineer, Infrastructure Platforms",
+      "department": "Platforms Engineering",
+      "location": "Remote, Australia; Remote, Canada; Remote, France; Remote, Germany; Remote, India; Remote, Ireland; Remote, Israel; Remote, Japan; Remote, Netherlands; Remote, Singapore; Remote, South Korea; Remote, Spain; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Principal Engineer, Software Supply Chain Security",
+      "department": "Sec Engineering",
+      "location": "Remote, Canada; Remote, Israel; Remote, Netherlands; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Principal Field Security Engineer",
+      "department": "Product Security",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Principal Infrastructure Security Engineer",
+      "department": "Product Security",
+      "location": "Remote, APAC; Remote, Canada; Remote, EMEA; Remote, US"
+    },
+    {
+      "title": "Principal Product Manager, Security & Compliance",
+      "department": "Security & Compliance",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Principal Product Marketing Manager, Application Security ",
+      "department": "Product Marketing",
+      "location": "Remote, Americas"
+    },
+    {
+      "title": "Principal Product Marketing Manager, DevSecOps Platform",
+      "department": "Product Marketing",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Principal Security Engineer, Application Security ",
+      "department": "Product Security",
+      "location": "Remote, Canada; Remote, France; Remote, Germany; Remote, Ireland; Remote, Netherlands; Remote, Spain; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Principal Solutions Architect",
+      "department": "SA",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Product Designer, Growth Acquisition ",
+      "department": "Product Design",
+      "location": "Remote, Canada; Remote, France; Remote, Ireland; Remote, Netherlands; Remote, Spain; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Program Manager, Field Enablement Content - US Remote",
+      "department": "Enablement",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Public Sector Strategic Account Executive - Central & Strategic Government, UK ",
+      "department": "EMEA - Enterprise",
+      "location": "Remote, United Kingdom"
+    },
+    {
+      "title": "Public Sector Strategic Account Executive - DoD",
+      "department": "PubSec - FED",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Public Sector Strategic Account Executive - Federal Civilian ",
+      "department": "PubSec - FED",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Public Sector Strategic Account Executive - Intelligence Community",
+      "department": "PubSec - FED",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Public Sector Strategic Account Executive - Rome / Milan, Italy",
+      "department": "EMEA - Enterprise",
+      "location": "Remote, Italy"
+    },
+    {
+      "title": "Public Sector Strategic Account Executive - SLED, Northeast",
+      "department": "PubSec - SLED",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Regional Director Sales, META",
+      "department": "EMEA - Enterprise",
+      "location": "Remote, United Arab Emirates"
+    },
+    {
+      "title": "Regional Marketing Manager",
+      "department": "Regional Marketing",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Renewals Manager- AMER",
+      "department": "Renewals",
+      "location": "Remote, North America"
+    },
+    {
+      "title": "Renewals Strategy Manager",
+      "department": "Field Operations",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Revenue Systems & Processes Manager",
+      "department": "Field Operations",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Sales Analytics Manager",
+      "department": "Field Operations",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Sales Commission Analyst",
+      "department": "Accounting Operations",
+      "location": "Remote, Ireland; Remote, Spain"
+    },
+    {
+      "title": "Salesforce Admin/Release Engineer, CRM Systems",
+      "department": "Enterprise Applications",
+      "location": "Remote, APAC"
+    },
+    {
+      "title": "Senior Analyst, Analytics and Insights",
+      "department": "FP&A",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Senior Backend Engineer (Golang), Monitor:Platform Insights",
+      "department": "Data Engineering",
+      "location": "Remote, APAC"
+    },
+    {
+      "title": "Senior Backend Engineer (Golang), Software Supply Chain Security: Authentication Infrastructure",
+      "department": "Sec Engineering",
+      "location": "Remote, APAC"
+    },
+    {
+      "title": "Senior Backend Engineer(Golang),Software Supply Chain Security: Auth Infrastructure",
+      "department": "Sec Engineering",
+      "location": "Remote, Americas; Remote, APAC; Remote, Canada"
+    },
+    {
+      "title": "Senior Backend Engineer (RoR), Software Supply Chain Security: Authorization",
+      "department": "Sec Engineering",
+      "location": "Remote, Canada; Remote, Netherlands; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Senior Backend Engineer (Ruby on Rails), Verify: Pipeline Execution",
+      "department": "DevOps Engineering",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Senior Backend (Go) Engineer, Gitlab Delivery -Operate",
+      "department": "Platforms Engineering",
+      "location": "Remote, Americas; Remote, EMEA"
+    },
+    {
+      "title": "Senior Customer Success Analytics Analyst",
+      "department": "Field Operations",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Senior Customer Success Manager",
+      "department": "CSM",
+      "location": "Remote, United Kingdom"
+    },
+    {
+      "title": "Senior Director, Enterprise Architecture and AI",
+      "department": "Enterprise Applications",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Senior Director, Enterprise Technology & AI - India",
+      "department": "Enterprise Applications",
+      "location": "Remote, India"
+    },
+    {
+      "title": "Senior Director, Public Sector Customer Success",
+      "department": "Customer Success - PubSec",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Senior Ecosystem Sales Manager - Japan",
+      "department": "Alliances and Channel",
+      "location": "Remote, Japan"
+    },
+    {
+      "title": "Senior FP&A Analyst, Corporate Finance",
+      "department": "FP&A",
+      "location": "Remote; Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Senior Frontend Engineer, AI Engineering: Duo Chat",
+      "department": "AI Engineering",
+      "location": "Remote, Americas; Remote, EMEA"
+    },
+    {
+      "title": "Senior Infrastructure Security Engineer ",
+      "department": "Product Security",
+      "location": "Remote, Australia; Remote, EMEA; Remote, Japan"
+    },
+    {
+      "title": "Senior Manager, Developer Advocacy",
+      "department": "Developer Relations",
+      "location": "Remote, EMEA; Remote, North America"
+    },
+    {
+      "title": "Senior Manager, Engagement Manager  - AMER",
+      "department": "Practice Management",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Senior Marketing Data Analyst",
+      "department": "Marketing Analytics",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Senior Product Manager, Dedicated",
+      "department": "Platforms",
+      "location": "Remote, Ireland; Remote, Netherlands; Remote, United Kingdom"
+    },
+    {
+      "title": "Senior Product Manager, Plan",
+      "department": "Core DevOps",
+      "location": "Remote, Ireland; Remote, Netherlands; Remote, United Kingdom"
+    },
+    {
+      "title": "Senior Professional Services Engagement Manager - PubSec - US",
+      "department": "Practice Management",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Senior Professional Services, Technical Architect - FDE - US Remote",
+      "department": "Consulting Delivery",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Senior Professional Services Technical Architect, META",
+      "department": "Consulting Delivery",
+      "location": "Remote, United Arab Emirates"
+    },
+    {
+      "title": "Senior Sales Recruiter",
+      "department": "Talent Acquisition",
+      "location": "Remote, United Kingdom"
+    },
+    {
+      "title": "Senior Site Reliability Engineer, Environment Automation",
+      "department": "Platforms Engineering",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Senior Technical Architect - Japan ",
+      "department": "Consulting Delivery",
+      "location": "Remote, Japan"
+    },
+    {
+      "title": "SMB Regional Manager \u2013 Growth, AMER",
+      "department": "Global Digital - AMER",
+      "location": "Remote, North America"
+    },
+    {
+      "title": "Software Engineering Manager, Application Security Testing: Composition Analysis & Dynamic Analysis",
+      "department": "Sec Engineering",
+      "location": "Remote, Canada; Remote, Israel; Remote, Netherlands; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Solution Architect - Ecosystems APAC",
+      "department": "SA",
+      "location": "Remote, Singapore"
+    },
+    {
+      "title": "Solutions Architect - Commercial",
+      "department": "SA",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Solutions Architect, DACH",
+      "department": "SA",
+      "location": "Remote, Germany"
+    },
+    {
+      "title": "Solutions Architect - New Business",
+      "department": "SA",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Solutions Architect, West",
+      "department": "SA",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Staff Backend Engineer, Developer Experience (Ruby)",
+      "department": "Platforms Engineering",
+      "location": "Remote, APAC; Remote, Canada; Remote, EMEA; Remote, Netherlands; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Staff Engineer, GitLab Delivery - Operate",
+      "department": "Platforms Engineering",
+      "location": "Remote, Americas; Remote, EMEA"
+    },
+    {
+      "title": "Staff Product Designer, Knowledge Graph",
+      "department": "Product Design",
+      "location": "Remote, Canada; Remote, France; Remote, Germany; Remote, Ireland; Remote, Netherlands; Remote, Spain; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Staff Product Manager, Software Supply Chain Security",
+      "department": "Security & Compliance",
+      "location": "Remote, Canada; Remote, Ireland; Remote, Israel; Remote, Netherlands; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "Staff Workday Analyst",
+      "department": "People Operations",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "Strategic Account Executive - Germany",
+      "department": "EMEA - Enterprise",
+      "location": "Remote, Germany"
+    },
+    {
+      "title": "Strategic Account Executive - LATAM, Mexico City",
+      "department": "AMER - Enterprise",
+      "location": "Remote, Mexico"
+    },
+    {
+      "title": "Strategic Account Executive - North",
+      "department": "AMER - Enterprise",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Strategic Account Executive - Paris ",
+      "department": "EMEA - Enterprise",
+      "location": "Remote, France"
+    },
+    {
+      "title": "Strategic Account Executive -Telco, Nordics ",
+      "department": "EMEA - Enterprise",
+      "location": "Remote, Sweden"
+    },
+    {
+      "title": "Strategic Account Executive - West",
+      "department": "AMER - Enterprise",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Support Engineer, U.S. Government Support",
+      "department": "Customer Support",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Technical Chief of Staff to the CTO",
+      "department": "Office of the CTO",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Technical Program Manager",
+      "department": "Office of the CTO",
+      "location": "Remote, Canada; Remote, US"
+    },
+    {
+      "title": "UX Researcher ",
+      "department": "UX Research",
+      "location": "Remote, Canada; Remote, France; Remote, Germany; Remote, Ireland; Remote, Netherlands; Remote, Spain; Remote, United Kingdom; Remote, US"
+    },
+    {
+      "title": "UX Researcher, AI",
+      "department": "UX Research",
+      "location": "Remote, Canada; Remote, EMEA; Remote, US"
+    },
+    {
+      "title": "Vice President, Business Systems",
+      "department": "Enterprise Applications",
+      "location": "Remote, US"
+    },
+    {
+      "title": "Zuora Engineer",
+      "department": "Enterprise Applications",
+      "location": "Remote, APAC"
+    }
+  ]
+}

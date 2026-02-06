@@ -1,0 +1,78 @@
+{
+  "company": "Jira",
+  "ats_url": "levels.fyi/atlassian",
+  "timestamp": "2026-02-06T14:45:25.142282",
+  "job_count": 14,
+  "jobs": [
+    {
+      "title": "Principal Forward Deployed Engineer, AI (Remote)",
+      "location": "San Francisco, CA",
+      "department": "Engineering"
+    },
+    {
+      "title": "Principal Backend Software Engineer",
+      "location": "Bengaluru, Karnataka, India",
+      "department": "Engineering"
+    },
+    {
+      "title": "Head of Security - Detection and Response",
+      "location": "San Francisco, CA",
+      "department": "General"
+    },
+    {
+      "title": "ACE Program Manager",
+      "location": "United States",
+      "department": "Operations"
+    },
+    {
+      "title": "Senior Solutions Engineer, Enterprise (LATAM)",
+      "location": "New York, NY",
+      "department": "Engineering"
+    },
+    {
+      "title": "Senior Customer Success Manager, DX",
+      "location": "New York, NY",
+      "department": "Customer Success"
+    },
+    {
+      "title": "Senior Principal Software Engineer - FedRAMP",
+      "location": "San Francisco, CA",
+      "department": "Engineering"
+    },
+    {
+      "title": "People Data Scientist",
+      "location": "United States",
+      "department": "Data"
+    },
+    {
+      "title": "Principal Backend Software Engineer - Kubernetes",
+      "location": "Sydney, New South Wales, Australia",
+      "department": "Engineering"
+    },
+    {
+      "title": "Sales Development Representative, Mid-Market",
+      "location": "Amsterdam, North Holland, Netherlands",
+      "department": "Sales"
+    },
+    {
+      "title": "Account Executive, Enterprise Nordics",
+      "location": "United Kingdom",
+      "department": "Sales"
+    },
+    {
+      "title": "Principal Frontend Software Engineer",
+      "location": "Sydney, New South Wales, Australia",
+      "department": "Engineering"
+    },
+    {
+      "title": "Senior Enterprise Delivery Manager, Migrations (AMER)",
+      "location": "San Francisco, CA",
+      "department": "General"
+    },
+    {
+      "title": "Principal Machine Learning Engineer - Central AI",
+      "location": "San Francisco, CA",
+      "department": "Engineering"
+    }
+  ]
+}

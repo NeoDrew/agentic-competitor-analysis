@@ -1,0 +1,123 @@
+{
+  "company": "Monday.com",
+  "ats_url": "levels.fyi/mondaycom + linkedin:Monday.com",
+  "timestamp": "2026-02-06T14:51:00.172233",
+  "job_count": 23,
+  "jobs": [
+    {
+      "title": "Channel Partner Manager Lead \u2013 Mexico",
+      "location": "Mexico City, Mexico",
+      "department": "General"
+    },
+    {
+      "title": "Senior Channel Manager - South Korea",
+      "location": "Tokyo, Japan",
+      "department": "General"
+    },
+    {
+      "title": "Executive Assistant to the CRO",
+      "location": "New York, NY",
+      "department": "General"
+    },
+    {
+      "title": "Engineering Backend Team Lead- Data Platform",
+      "location": "Tel Aviv-Yafo, Tel Aviv District, Israel",
+      "department": "Engineering"
+    },
+    {
+      "title": "Core Account Manager",
+      "location": "Atlanta, GA",
+      "department": "General"
+    },
+    {
+      "title": "GTM Manager - AI, APJ",
+      "location": "Sydney, New South Wales, Australia",
+      "department": "Data"
+    },
+    {
+      "title": "GTM Programs & Operations Manager",
+      "location": "New York, NY",
+      "department": "Operations"
+    },
+    {
+      "title": "Corporate FP&A",
+      "location": "Tel Aviv-Yafo, Tel Aviv District, Israel",
+      "department": "Finance"
+    },
+    {
+      "title": "Senior ML Engineer - Infrastructure",
+      "location": "Warsaw, Mazowieckie, Poland",
+      "department": "Engineering"
+    },
+    {
+      "title": "Lead Product Analyst - Retention",
+      "location": "London, England, United Kingdom",
+      "department": "Product"
+    },
+    {
+      "title": "Solution Engineer, Enterprise (SLED)",
+      "location": "New York, NY",
+      "department": "Engineering"
+    },
+    {
+      "title": "RFP and Tenders Manager",
+      "location": "London, England, United Kingdom",
+      "department": "General"
+    },
+    {
+      "title": "Senior Product Analyst - Core",
+      "location": "Tel Aviv-Yafo, Tel Aviv District, Israel",
+      "department": "Product"
+    },
+    {
+      "title": "Android Tech Lead",
+      "location": "Tel Aviv-Yafo, Tel Aviv District, Israel",
+      "department": "Engineering"
+    },
+    {
+      "title": "Talent Acquisition Partner, Business",
+      "location": "New York, NY",
+      "department": "Design"
+    },
+    {
+      "title": "Community and Events Program Manager",
+      "department": "Operations",
+      "location": "New York, NY"
+    },
+    {
+      "title": "Program Manager, Social Impact and Responsibility",
+      "department": "Operations",
+      "location": "New York, NY"
+    },
+    {
+      "title": "Social & Brand Manager, Elevate",
+      "department": "Marketing",
+      "location": "New York, NY"
+    },
+    {
+      "title": "Sales Development Representative",
+      "department": "Sales",
+      "location": "New York, NY"
+    },
+    {
+      "title": "Customer Success Team Manager",
+      "department": "Customer Success",
+      "location": "New York, NY"
+    },
+    {
+      "title": "Customer Success Manager",
+      "department": "Customer Success",
+      "location": "Atlanta, GA"
+    },
+    {
+      "title": "Partner Project Manager",
+      "department": "Operations",
+      "location": "New York, NY"
+    },
+    {
+      "title": "Senior Customer Success Team Manager",
+      "department": "Customer Success",
+      "location": "New York, NY"
+    }
+  ]
+}

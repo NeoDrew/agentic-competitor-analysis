@@ -1,0 +1,78 @@
+{
+  "company": "GitHub Projects",
+  "ats_url": "levels.fyi/github",
+  "timestamp": "2026-02-06T15:12:57.837715",
+  "job_count": 14,
+  "jobs": [
+    {
+      "title": "Sr. Manager, Customer Success Architecture",
+      "location": "United States",
+      "department": "Engineering"
+    },
+    {
+      "title": "Staff Software Engineer",
+      "location": "United States",
+      "department": "Engineering"
+    },
+    {
+      "title": "Senior Customer Success Architect",
+      "location": "India",
+      "department": "Engineering"
+    },
+    {
+      "title": "Staff Researcher",
+      "location": "Canada",
+      "department": "General"
+    },
+    {
+      "title": "Strategic Account Manager",
+      "location": "Germany",
+      "department": "General"
+    },
+    {
+      "title": "Director, Sales Development - AMERICA",
+      "location": "Bellevue, WA",
+      "department": "Sales"
+    },
+    {
+      "title": "Enterprise Business Representative",
+      "location": "Bellevue, WA",
+      "department": "General"
+    },
+    {
+      "title": "SMB Account Executive",
+      "location": "Amsterdam Area",
+      "department": "Sales"
+    },
+    {
+      "title": "Support Engineer II",
+      "location": "Amsterdam Area",
+      "department": "Engineering"
+    },
+    {
+      "title": "Customer Success Architect II",
+      "location": "United States",
+      "department": "Engineering"
+    },
+    {
+      "title": "Staff Product Manager",
+      "location": "United States",
+      "department": "Product"
+    },
+    {
+      "title": "Senior Offensive Security Engineer",
+      "location": "United Kingdom",
+      "department": "Engineering"
+    },
+    {
+      "title": "Senior Design Engineer",
+      "location": "Canada",
+      "department": "Engineering"
+    },
+    {
+      "title": "Software Engineer II, Safety",
+      "location": "United States",
+      "department": "Engineering"
+    }
+  ]
+}
